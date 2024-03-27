@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Employee Profile</title>
+</head>
+<body>
+    <br>
+    <div class="row">
+        <div class="col-md">
+            <div class="card card-body">
+                <h3>Employee: {{employee.name}}</h3>
+                <hr>
+                <a class="btn btn-outline-info  btn-sm btn-block" href="{% url 'update employee' employee.employee_id %}">Update Info</a>    
+                <a class="btn btn-primary  btn-sm btn-block" href="{% url 'home page' %}">Home</a>
+            </div>
+        </div>
+    
+        <div class="col-md">
+            <div class="card card-body">
+                <h4>Contact Information</h4>
+                <hr>
+                <p>Email:  {{employee.email}}</p>
+                <p>Phone Number:  {{employee.phone}}</p>
+                <p>Address:  {{employee.address}}</p>
+                <p>Position:  {{employee.position}}</p>
+                <p>Team Number:  {{employee.team_id}}</p>
+                <p>Points:  {{employee.points}}</p>
+
+            </div>
+        </div>
+    
+        <div class="col-md">
+            <div class="card card-body">
+                <h4>Total Tasks: </h4>
+                <hr>
+                <h1 style="text-align: center;padding: 10px">{{total_tasks}}</h1>
+            </div>
+        </div>
+        <div class="col-md">
+            <div class="card card-body">
+                <h4>Completed Tasks: </h4>
+                <hr>
+                <h1 style="text-align: center;padding: 10px">{{completed_tasks}}</h1>
+            </div>
+        </div>
+        <div class="col-md">
+            <div class="card card-body">
+                <h4>Percent Completion: </h4>
+                <hr>
+                <h1 style="text-align: center;padding: 10px">{{percent_completed}}</h1>
+            </div>
+        </div>
+    </div>      
+</body>
+</html>

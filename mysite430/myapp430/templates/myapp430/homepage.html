@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Home</title>
+</head>
+<body>
+    <br>
+
+    <div class="row">
+        <div class="col-md-5">
+            <h3>Employees {{total_employess}}</h3>
+            <hr>
+            <div class="card card-body">
+                <a class="btn btn-primary  btn-sm btn-block" href="{% url 'create employee' %}">Create Employee</a>
+                <table class="table table-sm">
+                    <tr>
+                        <th></th>
+                        <th>Employee</th>
+                        <th>Tasks</th>
+                    </tr>
+                    {% for employee in employees %}
+                        <tr>
+                            <td><a href="{% url 'view employee' employee.employee_id %}" class="btn btn-sm btn-info">View Employee</a></td>
+                            <td>{{employee.name}}</td>
+                            <td>{{employee.tasks}}</td>
+                            <td><a href="{% url 'delete employee' employee.employee_id %}" class="btn btn-sm btn-info">Delete Employee</a></td>
+
+                        </tr>
+                    {% endfor %}
+                </table>
+            </div>
+        </div>
+    
+        <div class="col-md-7">
+            <h3>Lis of Tasks</h3>
+            <hr>
+            <div class="card card-body">
+                <a class="btn btn-primary  btn-sm btn-block" href="{% url 'create task' %}">Add Task</a>
+                <table class="table table-sm">
+                    <tr>
+                        <th>Task</th>
+                        <th>Assignee</th>
+                        <th>Deadline</th>
+                        <th>Status</th>
+                        <th>Update</th>
+                        <th>Remove</th>
+                    </tr>
+                    {% for task in tasks %}
+                        <tr>
+                            <td>{{task.description}}</td>
+                            <td>{{task.employee}}</td>
+                            <td>{{task.deadline}}</td>
+                            <td>{{task.status}}</td>
+                            <td><a class="btn btn-sm btn-warning" href="{% url 'update task' task.task_id %}">Update</a></td>
+                            <td><a class="btn btn-sm btn-danger" href="{% url 'delete task' task.task_id %}">Delete</a></td>
+                        </tr>
+                    {% endfor %}
+                </table>
+            </div>
+        </div>
+    
+    </div>
+</body>
+</html>
