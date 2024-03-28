@@ -92,25 +92,33 @@ def createTask(request):
             form.save()
             return HttpResponseRedirect('/success')
     context = {'action':action, 'form':form}
-    return render(request, 'myapp430/createtask.html', context)
+    return render(request, 'myapp430/taskform.html', context)
 
-# modify task
+
+# update task
 def updateTask(request, id):
     action = 'update'
-    task = Task.objects.get(task_id = id)
-    form = TaskForm(instance=task)
-
+    task = Task.objects.get(task_id=id)
     if request.method == 'POST':
-        form = TaskForm(request.POST, instance=task)
+        form = TaskForm(request.POST, instance=task, include_status=True)
         if form.is_valid():
             form.save()
             return HttpResponseRedirect('/success')
+    else:
+        form = TaskForm(instance=task, include_status=True)
     context = {'action':action, 'form':form}
-    return render(request, 'myapp430/createtask.html', context)
+    return render(request, 'myapp430/taskform.html', context)
+
+
+
+
+
+
+
 
 # delete task
 def deleteTask(request, id):
-    task = Task.object.get(task_id=id)
+    task = Task.objects.get(task_id=id)
     if request.method == 'POST':
         task.delete()
         return HttpResponseRedirect('/success')

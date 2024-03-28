@@ -2,20 +2,28 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Create Task</title>
+    <title>Update Task</title>
 </head>
 <body>
     <div class="row">
         <div class="col-md-6">
             <div class="card card-body">
-                <h3>Create Task</h3>
+                <h3>Update Task</h3>
                 <form action="" method="POST">
                     {% csrf_token %}
                     <label for="description">Description:</label><br>
                     <textarea id="description" name="description" rows="4" cols="50">{{ form.description.value }}</textarea><br>
                     <label for="deadline">Deadline:</label><br>
                     <input type="datetime-local" id="deadline" name="deadline" value="{{ form.deadline.value|date:'Y-m-d\TH:i' }}"><br>
-                    <!-- Remove the status field completely from the create task form -->
+                    
+                    {% if action == 'update' %}
+                    <label for="status">Status:</label><br>
+                    <select id="status" name="status">
+                        <option value="0" {% if form.instance.status == 0 %}selected{% endif %}>In Progress</option>
+                        <option value="1" {% if form.instance.status == 1 %}selected{% endif %}>Complete</option>
+                    </select><br>
+                    {% endif %}
+                    
                     <input type="submit" value="Submit">
                 </form>
                 <a class="btn btn-primary btn-sm btn-block" href="{% url 'home page' %}">Home</a>
