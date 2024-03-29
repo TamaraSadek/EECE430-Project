@@ -19,8 +19,8 @@
                     {% if action == 'update' %}
                     <label for="status">Status:</label><br>
                     <select id="status" name="status">
-                        <option value="0" {% if form.instance.status == 0 %}selected{% endif %}>In Progress</option>
-                        <option value="1" {% if form.instance.status == 1 %}selected{% endif %}>Complete</option>
+                        <option value="In Progress" {% if form.instance.status = "In Progress" %}selected{% endif %}>In Progress</option>
+                        <option value="Complete" {% if form.instance.status = "Complete" %}selected{% endif %}>Complete</option>
                     </select><br>
                     {% endif %}
                     

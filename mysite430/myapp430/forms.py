@@ -4,19 +4,7 @@ from .models import Employee, Task
 class TaskForm(ModelForm):
     class Meta:
         model = Task
-        fields = ["employee", "description", "deadline", "points"]
-
-    def __init__(self, *args, **kwargs):
-        include_status = kwargs.pop('include_status', False)
-        super(TaskForm, self).__init__(*args, **kwargs)
-        
-        if not include_status:
-            try:
-                del self.fields['status']  # Exclude the status field if present
-            except KeyError:
-                pass
-
-
+        fields = ["employee", "description", "deadline", "points", "status"]
 
 
 class EmployeeForm(ModelForm):

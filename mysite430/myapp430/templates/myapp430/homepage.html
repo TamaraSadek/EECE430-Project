@@ -9,7 +9,7 @@
 
     <div class="row">
         <div class="col-md-5">
-            <h3>Employees {{total_employess}}</h3>
+            <h3>Employees ({{total_employees}})</h3>
             <hr>
             <div class="card card-body">
                 <a class="btn btn-primary  btn-sm btn-block" href="{% url 'create employee' %}">Create Employee</a>
@@ -37,21 +37,19 @@
             <hr>
             <div class="card card-body">
                 <a class="btn btn-primary  btn-sm btn-block" href="{% url 'create task' %}">Add Task</a>
-                <table class="table table-sm">
+                <table class="table table-sm" style="border-collapse: collapse;">
                     <tr>
-                        <th>Task</th>
-                        <th>Assignee</th>
-                        <th>Deadline</th>
-                        <th>Status</th>
-                        <th>Update</th>
-                        <th>Remove</th>
+                        <th style="border-right: 1px solid black; padding-right: 10px;">Task</th>
+                        <th style="border-right: 1px solid black; padding-right: 10px;">Assignee</th>
+                        <th style="border-right: 1px solid black; padding-right: 10px;">Deadline</th>
+                        <th style="padding-right: 10px;">Status</th>
                     </tr>
                     {% for task in tasks %}
                         <tr>
-                            <td>{{task.description}}</td>
-                            <td>{{task.employee}}</td>
-                            <td>{{task.deadline}}</td>
-                            <td>{{task.status}}</td>
+                            <td style="border-right: 1px solid black; padding-right: 10px; padding-left: 10px;">{{task.description}}</td>
+                            <td style="border-right: 1px solid black; padding-right: 10px;  padding-left: 10px;">{{task.employee}}</td>
+                            <td style="border-right: 1px solid black; padding-right: 10px;  padding-left: 10px;">{{task.deadline}}</td>
+                            <td style="padding-right: 10px;  padding-left: 10px;">{{task.status}}</td>
                             <td><a class="btn btn-sm btn-warning" href="{% url 'update task' task.task_id %}">Update</a></td>
                             <td><a class="btn btn-sm btn-danger" href="{% url 'delete task' task.task_id %}">Delete</a></td>
                         </tr>
@@ -59,7 +57,6 @@
                 </table>
             </div>
         </div>
-    
     </div>
 </body>
 </html>

@@ -3,6 +3,7 @@ from django.http import HttpResponse
 from .models import *
 from .forms import * 
 from django.http import HttpResponseRedirect
+from django.db import transaction
 
 # Home Page
 def home(request):
@@ -10,8 +11,8 @@ def home(request):
     tasks = Task.objects.all()
     total_employees = employees.count()
     total_tasks = tasks.count()
-    complete_tasks = Task.objects.filter(status=1).count()
-    pending_tasks = Task.objects.filter(status=0).count()
+    complete_tasks = Task.objects.filter(status='Complete').count()
+    pending_tasks = Task.objects.filter(status='In Progress').count()
 
     context = {'employees':employees, 'tasks':tasks,
 	'total_employees':total_employees,'total_tasks':total_tasks, 
@@ -23,15 +24,14 @@ def viewEmployee(request, id):
     employee = Employee.objects.get(employee_id=id)
     tasks = Task.objects.filter(employee=employee)
     total_tasks = tasks.count()
-    completed_tasks = tasks.filter(status=1).count()
+    completed_tasks = tasks.filter(status='Complete').count()
     if total_tasks > 0:
-        percent_completed = (completed_tasks / total_tasks) * 100
+        percent_completed = round((completed_tasks / total_tasks) * 100, 2)
     else:
         percent_completed = 0
     context = {'employee':employee, 'tasks':tasks, 'total_tasks':total_tasks, 'completed_tasks': completed_tasks, 'percent_completed': percent_completed}
     return render(request, 'myapp430/employeeprofile.html', context)
 
-    
     
 # Employee Functions
 # create employee
@@ -80,6 +80,7 @@ def deleteEmployee(request, id):
         return HttpResponseRedirect('/success')
     return render(request, 'myapp430/deleteitem.html', {'item':employee})
 
+
 #Task Functions
 # assign task
 def createTask(request):
@@ -88,33 +89,38 @@ def createTask(request):
     if request.method == 'POST':
         form = TaskForm(request.POST)
         if form.is_valid():
-            formdata = form.cleaned_data
             form.save()
+            task = form.instance 
+            if task.status == 'Complete' and task.credited == False:
+                employee = task.employee
+                with transaction.atomic():
+                    employee.points += task.points
+                    task.credited = True
+                    employee.save()
+                    task.save()
             return HttpResponseRedirect('/success')
     context = {'action':action, 'form':form}
     return render(request, 'myapp430/taskform.html', context)
-
 
 # update task
 def updateTask(request, id):
     action = 'update'
     task = Task.objects.get(task_id=id)
     if request.method == 'POST':
-        form = TaskForm(request.POST, instance=task, include_status=True)
+        form = TaskForm(request.POST, instance=task)
         if form.is_valid():
             form.save()
+            if form.cleaned_data['status'] == 'Complete' and task.credited == False:
+                with transaction.atomic():
+                    task.employee.points +=  form.cleaned_data['points']
+                    task.credited = True
+                    task.employee.save()
+                    task.save()
             return HttpResponseRedirect('/success')
     else:
-        form = TaskForm(instance=task, include_status=True)
+        form = TaskForm(instance=task)
     context = {'action':action, 'form':form}
     return render(request, 'myapp430/taskform.html', context)
-
-
-
-
-
-
-
 
 # delete task
 def deleteTask(request, id):
@@ -123,6 +129,7 @@ def deleteTask(request, id):
         task.delete()
         return HttpResponseRedirect('/success')
     return render(request, 'myapp430/deleteitem.html', {'item':task})
+
 
 # Successful Execution
 def success(request):

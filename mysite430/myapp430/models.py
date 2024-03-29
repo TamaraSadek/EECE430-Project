@@ -29,16 +29,17 @@ class Employee(models.Model):
 class Task(models.Model):
 
 	STATUS = (
-			(1, 'Complete'),
-			(0, 'In Progress'),
+			('Complete', 'Complete'),
+			('In Progress', 'In Progress'),
 			) 
 	task_id = models.AutoField(primary_key=True)
 	employee = models.ForeignKey(Employee, on_delete= models.SET_NULL, null=True)
 	deadline=  models.DateTimeField()
 	points = models.IntegerField(default=0)
 	description = models.TextField()
-	status = models.IntegerField(choices=STATUS, default=0)
+	status = models.CharField(choices=STATUS, default='In Progress', max_length=11)
 	date_created = models.DateTimeField(auto_now_add=True, null=True, blank=True)
+	credited = models.BooleanField(default=False)
 
 	def __str__(self):
 		return self.description
