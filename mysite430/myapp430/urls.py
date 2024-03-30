@@ -12,5 +12,8 @@ urlpatterns = [
     path('create task/', views.createTask , name="create task"),
     path('update task/<int:id>/', views.updateTask, name="update task"),
     path('delete task/<int:id>/', views.deleteTask, name="delete task"),
-    url('success/', success),
-]
+    path('add event/',views.addEvent,name="add event"),
+    path('update event/<int:id>/', views.updateEvent,name="update Event"),
+    path('delete event/<int:id>/', views.deleteEvent, name="delete event"),
+    path('signup event/<int:id>/', views.SignupEvent, name="Signup event"),
+    url('success/', success), ]

@@ -12,6 +12,10 @@ class EmployeeForm(ModelForm):
 		model = Employee
 		fields = ["name", "phone", "email", "position", "team_id", "address"]
 
+class EventsForm(ModelForm):
+    class Meta:
+        model = Events
+        fields = ["event_name","participants","event_id","description","date","location"]
 class GoalsForm(ModelForm):
     class Meta:
         model = Goals
@@ -21,10 +25,7 @@ class MoodForm(ModelForm):
     class Meta:
         model = Mood
         fields = ["mood","employee", "date", "team_id"]
-class EventsForm(ModelForm):
-    class Meta:
-        model = Events
-        fields = ["event_name","participants","event_id","description","date","location"]
+
 class GiftsForm(ModelForm):
     class Meta:
         model = Gifts
