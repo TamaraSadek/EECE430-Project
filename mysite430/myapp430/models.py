@@ -13,7 +13,7 @@ class Employee(models.Model):
 	phone = models.CharField(max_length=15, null=True)
 	email = models.CharField(max_length=200)
 	position = models.CharField(max_length=200,choices=CATEGORY)
-	team_id = models.IntegerField(null=True)
+	team_id = models.IntegerField(null=True) # should this be from Team DB?? 
 	address=models.CharField(max_length=200, null=True)
 	points=models.IntegerField(default=0)
 
