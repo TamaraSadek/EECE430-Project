@@ -24,7 +24,7 @@ class MoodForm(ModelForm):
 class EventsForm(ModelForm):
     class Meta:
         model = Events
-        fields = ["event_name","event_id","description","date","location"]
+        fields = ["event_name","participants","event_id","description","date","location"]
 class GiftsForm(ModelForm):
     class Meta:
         model = Gifts

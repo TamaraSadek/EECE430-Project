@@ -81,6 +81,7 @@ class Events(models.Model): #- Events DB (event id,event name, description, date
 	description = models.TextField()
 	date = models.DateTimeField(auto_now_add=True, null=True, blank=True)
 	location=models.TextField()
+	participants = models.ManyToManyField(Employee, blank=True)
 
 def __str__(self):
 	return self.event_name

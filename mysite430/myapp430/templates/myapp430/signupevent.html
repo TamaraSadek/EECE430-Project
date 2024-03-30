@@ -1,0 +1,14 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Event Signup</title>
+</head>
+<body>
+    <h2>Event Signup Form</h2>
+    <form action="{% url 'signup_event' %}" method="POST">
+        {% csrf_token %}
+        <input type="submit" value="Sign Up">
+    </form>
+</body>
+</html>

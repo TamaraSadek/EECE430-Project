@@ -1,3 +1,4 @@
+from multiprocessing import Event
 from django.shortcuts import render,redirect
 from django.http import HttpResponse
 from .models import *
@@ -131,6 +132,54 @@ def deleteTask(request, id):
     return render(request, 'myapp430/deleteitem.html', {'item':task})
 
 
+# Events Functions
+# Add Event
+def addEvent(request):
+    form = EventsForm()
+    action = 'create'
+    if request.method == 'POST':
+        form = EventsForm(request.POST)
+        if form.is_valid():
+            formdata = form.cleaned_data
+            form.save()
+            return HttpResponseRedirect('/success')
+    context = {'action':action, 'form':form}
+    return render(request, 'myapp430/createevent.html', context)
+
+#Update Event
+def updateEvent(request, id):
+    action = 'update'
+    Event = Events.objects.get(event_id = id)
+    form = EventsForm(instance=Event)
+
+    if request.method == 'POST':
+        form = EventsForm(request.POST, instance=Event)
+        if form.is_valid():
+            form.save()
+            return HttpResponseRedirect('/success')
+    context = {'action':action, 'form':form}
+    return render(request, 'myapp430/createevent.html', context)
+
+#delete event
+def deleteEvent(request, id):
+    Event = Events.objects.get(event_id=id)
+    if request.method == 'POST':
+        Event.delete()
+        return HttpResponseRedirect('/success')
+    return render(request, 'myapp430/deleteitem.html', {'item':Event})
+
+def SignupEvent(request,id):
+    event = Events.objects.get(event_id=id)
+    if request.method == 'POST':
+        form = EventsForm(request.POST)
+        if form.is_valid():
+            current_employee = request.user.employee
+            event.participants.add(current_employee)
+            return HttpResponseRedirect('/success')
+
+    events = Events.objects.all()  # Fetch all events
+    context = {'form': form, 'events': events}
+    return render(request, 'myapp430/signupevent.html', context)
 # Successful Execution
 def success(request):
     return render(request, 'myapp430/success.html')
