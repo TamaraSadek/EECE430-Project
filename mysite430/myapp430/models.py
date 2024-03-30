@@ -45,61 +45,61 @@ class Task(models.Model):
 		return self.description
 
 
-	class Goals(models.Model):
-		STATUS = (
-			('Complete', 'Complete'),
-			('In Progress', 'In Progress'),
-			) 
-		goal_id = models.AutoField(primary_key=True)
-		employee = models.ForeignKey(Employee, on_delete= models.SET_NULL, null=True)
-		deadline=  models.DateTimeField()
-		points = models.IntegerField(default=0)
-		description = models.TextField()
-		status = models.CharField(choices=STATUS, default='In Progress', max_length=11)
-		date_created = models.DateTimeField(auto_now_add=True, null=True, blank=True)
+class Goals(models.Model):
+	STATUS = (
+		('Complete', 'Complete'),
+		('In Progress', 'In Progress'),
+		) 
+	goal_id = models.AutoField(primary_key=True)
+	employee = models.ForeignKey(Employee, on_delete= models.SET_NULL, null=True)
+	deadline=  models.DateTimeField()
+	points = models.IntegerField(default=0)
+	description = models.TextField()
+	status = models.CharField(choices=STATUS, default='In Progress', max_length=11)
+	date_created = models.DateTimeField(auto_now_add=True, null=True, blank=True)
 
 
-	def __str__(self):
-		return self.description
+def __str__(self):
+	return self.description
 
-	class Mood(models.Model): #- Mood DB (mood, date, employee, team id)
-		STATUS = (
-			('Complete', 'Complete'),
-			('In Progress', 'In Progress'),
-			) 
-		mood=models.TextField()
-		employee = models.ForeignKey(Employee, on_delete= models.SET_NULL, null=True)
-		date = models.DateTimeField(auto_now_add=True, null=True, blank=True)
-		team_id = models.IntegerField(null=True)
+class Mood(models.Model): #- Mood DB (mood, date, employee, team id)
+	STATUS = (
+		('Complete', 'Complete'),
+		('In Progress', 'In Progress'),
+		) 
+	mood=models.TextField()
+	employee = models.ForeignKey(Employee, on_delete= models.SET_NULL, null=True)
+	date = models.DateTimeField(auto_now_add=True, null=True, blank=True)
+	team_id = models.IntegerField(null=True)
 
-	def __str__(self):
-		return self.mood
+def __str__(self):
+	return self.mood
 
-	class Events(models.Model): #- Events DB (event id,event name, description, date, location)
-		event_name=models.TextField()
-		event_id = models.AutoField(primary_key=True)
-		description = models.TextField()
-		date = models.DateTimeField(auto_now_add=True, null=True, blank=True)
-		location=models.TextField()
+class Events(models.Model): #- Events DB (event id,event name, description, date, location)
+	event_name=models.TextField()
+	event_id = models.AutoField(primary_key=True)
+	description = models.TextField()
+	date = models.DateTimeField(auto_now_add=True, null=True, blank=True)
+	location=models.TextField()
 
-	def __str__(self):
-		return self.event_name
+def __str__(self):
+	return self.event_name
 
-	#- Gifts DB (giftname, description, price(points), stock)
-	class Gifts(models.Model): 
-		gift_name=models.TextField()
-		description = models.TextField()
-		stock=models.IntegerField(default=0)
-		price=models.IntegerField(default=0)
-	def __str__(self):
-		return self.gift_name
+#- Gifts DB (giftname, description, price(points), stock)
+class Gifts(models.Model): 
+	gift_name=models.TextField()
+	description = models.TextField()
+	stock=models.IntegerField(default=0)
+	price=models.IntegerField(default=0)
+def __str__(self):
+	return self.gift_name
 	
-	# Team DB( team name, members, team leader, description)
-	class Team(models.Model):
-		team_id = models.AutoField(primary_key=True)
-		members = models.ManyToManyField(Employee)
-		description = models.TextField()
-		team_name= models.TextField()
+# Team DB( team name, members, team leader, description)
+class Team(models.Model):
+	team_id = models.AutoField(primary_key=True)
+	members = models.ManyToManyField(Employee)
+	description = models.TextField()
+	team_name= models.TextField()
 
-	def __str__(self):
-		return self.team_name
+def __str__(self):
+	return self.team_name
