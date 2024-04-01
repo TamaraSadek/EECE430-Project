@@ -10,14 +10,21 @@ from django.db import transaction
 def home(request):
     employees = Employee.objects.all().order_by('employee_id')
     tasks = Task.objects.all()
+    events = Events.objects.all()  # Retrieve all events
     total_employees = employees.count()
     total_tasks = tasks.count()
     complete_tasks = Task.objects.filter(status='Complete').count()
     pending_tasks = Task.objects.filter(status='In Progress').count()
 
-    context = {'employees':employees, 'tasks':tasks,
-	'total_employees':total_employees,'total_tasks':total_tasks, 
-	'complete':complete_tasks, 'in Progress':pending_tasks}
+    context = {
+        'employees': employees,
+        'tasks': tasks,
+        'events': events,  # Add events to the context
+        'total_employees': total_employees,
+        'total_tasks': total_tasks,
+        'complete': complete_tasks,
+        'in_progress': pending_tasks,  # Fix the key name to match the template
+    }
     return render(request, 'myapp430/homepage.html', context)
 
 # Employee Profile
@@ -168,8 +175,9 @@ def deleteEvent(request, id):
         return HttpResponseRedirect('/success')
     return render(request, 'myapp430/deleteitem.html', {'item':Event})
 
-def SignupEvent(request,id):
+def SignupEvent(request, id):
     event = Events.objects.get(event_id=id)
+    form = EventsForm()  # Create an empty form
     if request.method == 'POST':
         form = EventsForm(request.POST)
         if form.is_valid():
@@ -177,9 +185,9 @@ def SignupEvent(request,id):
             event.participants.add(current_employee)
             return HttpResponseRedirect('/success')
 
-    events = Events.objects.all()  # Fetch all events
-    context = {'form': form, 'events': events}
+    context = {'form': form, 'event': event}  # Pass the form and event to the template
     return render(request, 'myapp430/signupevent.html', context)
+
 # Successful Execution
 def success(request):
     return render(request, 'myapp430/success.html')

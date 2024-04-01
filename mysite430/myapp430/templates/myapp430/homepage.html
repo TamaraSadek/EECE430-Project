@@ -56,6 +56,40 @@
                     {% endfor %}
                 </table>
             </div>
+            
+            <h3>List of Events</h3>
+            <hr>
+            <div class="card card-body">
+                <a class="btn btn-primary  btn-sm btn-block" href="{% url 'add event' %}">Add Event</a>
+                <table class="table table-sm" style="border-collapse: collapse;">
+                    <tr>
+                        <th style="border-right: 1px solid black; padding-right: 10px;">Event Name</th>
+                        <th style="border-right: 1px solid black; padding-right: 10px;">Description</th>
+                        <th style="border-right: 1px solid black; padding-right: 10px;">Date</th>
+                        <th style="border-right: 1px solid black; padding-right: 10px;">Location</th>
+                        <th style="border-right: 1px solid black; padding-right: 10px;">Participants</th>
+                        <th style="padding-right: 10px;">Actions</th>
+                    </tr>
+                    {% for event in events %}
+                        <tr>
+                            <td style="border-right: 1px solid black; padding-right: 10px; padding-left: 10px;">{{ event.event_name }}</td>
+                            <td style="border-right: 1px solid black; padding-right: 10px;  padding-left: 10px;">{{ event.description }}</td>
+                            <td style="border-right: 1px solid black; padding-right: 10px;  padding-left: 10px;">{{ event.date }}</td>
+                            <td style="border-right: 1px solid black; padding-right: 10px;  padding-left: 10px;">{{ event.location }}</td>
+                            <td>
+                                <ul>
+                                    {% for participant in event.participants.all %}
+                                    <li>{{ participant.name }}</li>
+                                    {% endfor %}
+                                </ul>
+                            </td>
+                            <td><a class="btn btn-sm btn-warning" href="{% url 'update Event' event.event_id %}">Update</a></td>
+                            <td><a class="btn btn-sm btn-danger" href="{% url 'delete event' event.event_id %}">Delete</a></td>
+                            <td><a class="btn btn-sm btn-primary" href="{% url 'Signup event' event.event_id %}">Sign Up</a></td>
+                        </tr>
+                    {% endfor %}
+                </table>
+            </div>
         </div>
     </div>
 </body>

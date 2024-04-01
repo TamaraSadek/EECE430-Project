@@ -6,9 +6,11 @@
 </head>
 <body>
     <h2>Event Signup Form</h2>
-    <form action="{% url 'signup_event' %}" method="POST">
+    <form action="" method="POST">
         {% csrf_token %}
+        {{ form.as_p }}
         <input type="submit" value="Sign Up">
     </form>
 </body>
 </html>
+

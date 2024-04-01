@@ -1,4 +1,4 @@
-from django.forms import ModelForm
+from django.forms import ModelForm, CheckboxSelectMultiple
 from .models import Employee, Task,Goals, Mood,Events, Gifts,Team
 
 class TaskForm(ModelForm):
@@ -15,16 +15,25 @@ class EmployeeForm(ModelForm):
 class EventsForm(ModelForm):
     class Meta:
         model = Events
-        fields = ["event_name","participants","event_id","description","date","location"]
+        fields = ['event_name', 'description', 'location', 'participants']
+        widgets = {
+            'participants': CheckboxSelectMultiple,  # Render as checkboxes for multiple selection
+        }
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields['participants'].queryset = Employee.objects.all()  # Set queryset for participants field
+
+
 class GoalsForm(ModelForm):
     class Meta:
         model = Goals
-        fields = ["goals_id","employee", "deadline","points","description","status","date_created"]
+        fields = ["goal_id","employee", "deadline","points","description","status"]
 
 class MoodForm(ModelForm):
     class Meta:
         model = Mood
-        fields = ["mood","employee", "date", "team_id"]
+        fields = ["mood","employee", "team_id"]
 
 class GiftsForm(ModelForm):
     class Meta:
