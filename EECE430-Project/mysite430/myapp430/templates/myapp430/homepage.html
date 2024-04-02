@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Home</title>
+</head>
+<body>
+    <br>
+
+    <div class="row">
+        <div class="col-md-5">
+            <h3>Employees ({{total_employees}})</h3>
+            <hr>
+            <div class="card card-body">
+                <a class="btn btn-primary  btn-sm btn-block" href="{% url 'create employee' %}">Create Employee</a>
+                <table class="table table-sm">
+                    <tr>
+                        <th></th>
+                        <th>Employee</th>
+                        <th>Tasks</th>
+                    </tr>
+                    {% for employee in employees %}
+                        <tr>
+                            <td><a href="{% url 'view employee' employee.employee_id %}" class="btn btn-sm btn-info">View Employee</a></td>
+                            <td>{{employee.name}}</td>
+                            <td>{{employee.tasks}}</td>
+                            <td><a href="{% url 'delete employee' employee.employee_id %}" class="btn btn-sm btn-info">Delete Employee</a></td>
+
+                        </tr>
+                    {% endfor %}
+                </table>
+            </div>
+        </div>
+    
+        <div class="col-md-7">
+            <h3>List of Tasks</h3>
+            <hr>
+            <div class="card card-body">
+                <a class="btn btn-primary  btn-sm btn-block" href="{% url 'create task' %}">Add Task</a>
+                <table class="table table-sm" style="border-collapse: collapse;">
+                    <tr>
+                        <th style="border-right: 1px solid black; padding-right: 10px;">Task</th>
+                        <th style="border-right: 1px solid black; padding-right: 10px;">Assignee</th>
+                        <th style="border-right: 1px solid black; padding-right: 10px;">Deadline</th>
+                        <th style="padding-right: 10px;">Status</th>
+                    </tr>
+                    {% for task in tasks %}
+                        <tr>
+                            <td style="border-right: 1px solid black; padding-right: 10px; padding-left: 10px;">{{task.description}}</td>
+                            <td style="border-right: 1px solid black; padding-right: 10px;  padding-left: 10px;">{{task.employee}}</td>
+                            <td style="border-right: 1px solid black; padding-right: 10px;  padding-left: 10px;">{{task.deadline}}</td>
+                            <td style="padding-right: 10px;  padding-left: 10px;">{{task.status}}</td>
+                            <td><a class="btn btn-sm btn-warning" href="{% url 'update task' task.task_id %}" style="padding-right: 10px;">Update</a></td>
+                            <td><a class="btn btn-sm btn-danger" href="{% url 'delete task' task.task_id %}">Delete</a></td>
+                        </tr>
+                    {% endfor %}
+                </table>
+            </div>
+        <div class="col-md">
+            <div class="card card-body">
+                <h3>Task Completion Percentage: {{completion_percentage}}%</h3>
+                <hr>
+                <button onclick="refreshPage()">Refresh</button>
+
+                <script>
+                    function refreshPage() {
+                    location.reload();
+                }
+                </script>
+        </div>
+
+            <h3>List of Events</h3>
+            <hr>
+            <div class="card card-body">
+                <a class="btn btn-primary  btn-sm btn-block" href="{% url 'add event' %}">Add Event</a>
+                <table class="table table-sm" style="border-collapse: collapse;">
+                    <tr>
+                        <th style="border-right: 1px solid black; padding-right: 10px;">Event Name</th>
+                        <th style="border-right: 1px solid black; padding-right: 10px;">Description</th>
+                        <th style="border-right: 1px solid black; padding-right: 10px;">Date</th>
+                        <th style="padding-right: 10px; padding-left: 10px;">Location</th>
+                    </tr>
+                    {% for event in events %}
+                        <tr>
+                            <td style="border-right: 1px solid black; padding-right: 10px; padding-left: 10px;">{{ event.event_name }}</td>
+                            <td style="border-right: 1px solid black; padding-right: 10px;  padding-left: 10px;">{{ event.description }}</td>
+                            <td style="border-right: 1px solid black; padding-right: 10px;  padding-left: 10px;">{{ event.date }}</td>
+                            <td style="padding-right: 10px;  padding-left: 10px;">{{ event.location }}</td>
+                            <td>
+                                <ul>
+                                    {% for participant in event.participants.all %}
+                                    <li>{{ participant.name }}</li>
+                                    {% endfor %}
+                                </ul>
+                            </td>
+                            <td><a class="btn btn-sm btn-warning" href="{% url 'update Event' event.event_id %}" style="padding-right: 10px;">Update</a></td>
+                            <td><a class="btn btn-sm btn-danger" href="{% url 'delete event' event.event_id %}" style="padding-right: 10px;">Delete</a></td>
+                            <td><a class="btn btn-sm btn-primary" href="{% url 'Signup event' event.event_id %}">Sign Up</a></td>
+                        </tr>
+                    {% endfor %}
+                </table>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

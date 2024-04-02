@@ -1,0 +1,24 @@
+﻿<!-- createevent.html -->
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Create Event</title>
+</head>
+<body>
+    <div class="row">
+        <div class="col-md-6">
+            <div class="card card-body">
+                <h3>Add Event</h3>
+                <form action="" method="POST">
+                    {% csrf_token %}
+                    {{ form.as_p }}
+                    <input type="submit" value="Submit" />
+                </form>
+                <a class="btn btn-primary  btn-sm btn-block" href="{% url 'home page' %}">Home</a>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
