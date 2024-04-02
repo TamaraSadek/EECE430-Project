@@ -15,7 +15,7 @@ def home(request):
     total_tasks = tasks.count()
     complete_tasks = Task.objects.filter(status='Complete').count()
     pending_tasks = Task.objects.filter(status='In Progress').count()
-
+    completion_percentage = totalCompletion()
     context = {
         'employees': employees,
         'tasks': tasks,
@@ -24,6 +24,7 @@ def home(request):
         'total_tasks': total_tasks,
         'complete': complete_tasks,
         'in_progress': pending_tasks,  # Fix the key name to match the template
+        'completion_percentage' : completion_percentage,
     }
     return render(request, 'myapp430/homepage.html', context)
 
@@ -40,7 +41,15 @@ def viewEmployee(request, id):
     context = {'employee':employee, 'tasks':tasks, 'total_tasks':total_tasks, 'completed_tasks': completed_tasks, 'percent_completed': percent_completed}
     return render(request, 'myapp430/employeeprofile.html', context)
 
-    
+def totalCompletion():
+    total_tasks = Task.objects.count()
+    completed_tasks = Task.objects.filter(status='Complete').count()
+    if total_tasks > 0:
+        completion_percentage = (completed_tasks / total_tasks) * 100
+    else:
+        completion_percentage = 0
+    return round(completion_percentage, 2)
+
 # Employee Functions
 # create employee
 def createEmployee(request):
@@ -50,17 +59,6 @@ def createEmployee(request):
         form = EmployeeForm(request.POST)
         if form.is_valid():
             formdata = form.cleaned_data
-            ''''
-            instead of doing all of this, we will use form.save() method
-
-            name = formdata['name']
-            phone = formdata['phone']
-            email = formdata['email']
-            position = formdata['position']
-            team_id = formdata['team_id']
-            address = formdata['address']
-            Employee.objects.create(name=name,phone=phone,email=email,position=position,team_id=team_id,address=address)
-            '''
             form.save()
             return HttpResponseRedirect('/success')
     context = {'action':action, 'form':form}
@@ -175,6 +173,7 @@ def deleteEvent(request, id):
         return HttpResponseRedirect('/success')
     return render(request, 'myapp430/deleteitem.html', {'item':Event})
 
+'''
 def SignupEvent(request, id):
     event = Events.objects.get(event_id=id)
     form = EventsForm()  # Create an empty form
@@ -185,6 +184,24 @@ def SignupEvent(request, id):
             event.participants.add(current_employee)
             return HttpResponseRedirect('/success')
 
+    context = {'form': form, 'event': event}  # Pass the form and event to the template
+    return render(request, 'myapp430/signupevent.html', context)
+'''
+def SignupEvent(request, id):
+    event = Events.objects.get(event_id=id)
+    current_employee = request.user.employee
+    form = EventsForm()  # Create an empty form
+    if request.method == 'POST':
+        form = EventsForm(request.POST)
+        if form.is_valid():
+            # check if the current employee is already registered for the event
+            if EventRegistration.objects.filter(event=event, participant=current_employee).exists():
+                # handle the case where the employee is already registered
+                return HttpResponseRedirect('/already_registered') 
+    
+            event_registration = EventRegistration(event=event, participant=current_employee)
+            event_registration.save()
+            return HttpResponseRedirect('/success')
     context = {'form': form, 'event': event}  # Pass the form and event to the template
     return render(request, 'myapp430/signupevent.html', context)
 

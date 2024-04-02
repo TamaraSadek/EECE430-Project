@@ -15,15 +15,10 @@ class EmployeeForm(ModelForm):
 class EventsForm(ModelForm):
     class Meta:
         model = Events
-        fields = ['event_name', 'description', 'location', 'participants']
+        fields = ['event_name', 'description', 'date', 'location']
         widgets = {
             'participants': CheckboxSelectMultiple,  # Render as checkboxes for multiple selection
         }
-
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.fields['participants'].queryset = Employee.objects.all()  # Set queryset for participants field
-
 
 class GoalsForm(ModelForm):
     class Meta:
@@ -39,6 +34,7 @@ class GiftsForm(ModelForm):
     class Meta:
         model = Gifts
         fields = ["gift_name","description","stock","price"]
+
 class TeamForm(ModelForm):
     class Meta:
         model = Team

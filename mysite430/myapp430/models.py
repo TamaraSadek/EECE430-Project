@@ -76,12 +76,19 @@ def __str__(self):
 	return self.mood
 
 class Events(models.Model): #- Events DB (event id,event name, description, date, location)
-	event_name=models.TextField()
+	event_name = models.TextField()
 	event_id = models.AutoField(primary_key=True)
 	description = models.TextField()
-	date = models.DateTimeField(auto_now_add=True, null=True, blank=True)
+	date = models.DateTimeField(null=True, blank=True)
 	location=models.TextField()
-	participants = models.ManyToManyField(Employee, blank=True)
+
+class EventRegistration(models.Model):
+    event = models.ForeignKey(Events, on_delete=models.CASCADE)
+    participant = models.ForeignKey(Employee, on_delete=models.CASCADE)
+    registration_date = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        unique_together = ['event', 'participant'] #prevent users from signing up to the same event multiple times
 
 def __str__(self):
 	return self.event_name
