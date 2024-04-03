@@ -210,3 +210,6 @@ def SignupEvent(request, id):
 # Successful Execution
 def success(request):
     return render(request, 'myapp430/success.html')
+
+def testTamara():
+    return "nullTamara"
