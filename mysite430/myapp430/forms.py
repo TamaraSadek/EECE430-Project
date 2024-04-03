@@ -4,8 +4,12 @@ from .models import Employee, Task,Goals, Mood,Events, Gifts,Team
 class TaskForm(ModelForm):
     class Meta:
         model = Task
-        fields = ["employee", "description", "deadline", "points", "status"]
+        fields = ["employees", "description", "deadline", "points", "status"]
 
+class TaskAssignment(ModelForm):
+     class Meta:
+          model = Task
+          fields = ["employees"]
 
 class EmployeeForm(ModelForm):
 	class Meta:

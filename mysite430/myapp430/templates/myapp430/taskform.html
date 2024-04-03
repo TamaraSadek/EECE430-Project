@@ -3,7 +3,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>{% if action == 'create' %}Create Task{% elif action == 'update' %}Update Task{% endif %}</title>
+    <title>{% if action == 'create' %}Create Task{% elif action == 'update' %}Update Task{% elif action == 'assign' %}Assign Task{% endif %}</title>
 </head>
 <body>
     <div class="row">
@@ -13,6 +13,8 @@
                     <h3>Create Task</h3>
                 {% elif action == 'update' %}
                     <h3>Update Task</h3>
+                {% elif action == 'assign' %}
+                    <h3>Assign Task</h3>
                 {% endif %}
                 <form action="" method="POST">
                     {% csrf_token %}

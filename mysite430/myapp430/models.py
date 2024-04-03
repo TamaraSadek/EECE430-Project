@@ -33,7 +33,7 @@ class Task(models.Model):
 			('In Progress', 'In Progress'),
 			) 
 	task_id = models.AutoField(primary_key=True)
-	employee = models.ForeignKey(Employee, on_delete= models.SET_NULL, null=True)
+	employees = models.ManyToManyField(Employee, blank = True)
 	deadline=  models.DateTimeField()
 	points = models.IntegerField(default=0)
 	description = models.TextField()
@@ -42,7 +42,8 @@ class Task(models.Model):
 	credited = models.BooleanField(default=False)
 
 	def __str__(self):
-		return self.description
+		employee_names = ', '.join(str(employee) for employee in self.employees.all())
+		return f"{self.description} - Employees: {employee_names}"
 
 
 class Goals(models.Model):

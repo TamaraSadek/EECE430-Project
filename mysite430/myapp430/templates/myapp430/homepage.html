@@ -36,7 +36,7 @@
             <h3>List of Tasks</h3>
             <hr>
             <div class="card card-body">
-                <a class="btn btn-primary  btn-sm btn-block" href="{% url 'create task' %}">Add Task</a>
+                <a class="btn btn-primary  btn-sm btn-block" href="{% url 'create task' %}">Add Task</a> 
                 <table class="table table-sm" style="border-collapse: collapse;">
                     <tr>
                         <th style="border-right: 1px solid black; padding-right: 10px;">Task</th>
@@ -51,7 +51,8 @@
                             <td style="border-right: 1px solid black; padding-right: 10px;  padding-left: 10px;">{{task.deadline}}</td>
                             <td style="padding-right: 10px;  padding-left: 10px;">{{task.status}}</td>
                             <td><a class="btn btn-sm btn-warning" href="{% url 'update task' task.task_id %}" style="padding-right: 10px;">Update</a></td>
-                            <td><a class="btn btn-sm btn-danger" href="{% url 'delete task' task.task_id %}">Delete</a></td>
+                            <td><a class="btn btn-sm btn-danger" href="{% url 'delete task' task.task_id %}" style="padding-right: 10px;">Delete</a></td>
+                            <td><a class="btn btn-sm btn-danger" href="{% url 'assign task' task.task_id %}">Assign Task</a></td>
                         </tr>
                     {% endfor %}
                 </table>

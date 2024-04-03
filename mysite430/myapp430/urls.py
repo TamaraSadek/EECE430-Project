@@ -11,6 +11,7 @@ urlpatterns = [
     path('update employee/<int:id>/', views.updateEmployee, name="update employee"),
     path('delete employee/<int:id>/', views.deleteEmployee, name="delete employee"),
     path('create task/', views.createTask , name="create task"),
+    path('assign task/<int:id>/', views.assignTask , name="assign task"),
     path('update task/<int:id>/', views.updateTask, name="update task"),
     path('delete task/<int:id>/', views.deleteTask, name="delete task"),
     path('add event/',views.addEvent,name="add event"),

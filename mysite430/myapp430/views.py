@@ -89,8 +89,6 @@ def deleteEmployee(request, id):
 
 #Task Functions
 #create task
-
-# assign task
 def createTask(request):
     form = TaskForm()
     action = 'create'
@@ -98,15 +96,21 @@ def createTask(request):
         form = TaskForm(request.POST)
         if form.is_valid():
             form.save()
-            task = form.instance 
-            if task.status == 'Complete' and task.credited == False:
-                employee = task.employee
-                with transaction.atomic():
-                    employee.points += task.points
-                    task.credited = True
-                    employee.save()
-                    task.save()
             return HttpResponseRedirect('/success')
+    context = {'action':action, 'form':form}
+    return render(request, 'myapp430/taskform.html', context)
+
+# assign task
+def assignTask(request, id):
+    action = 'assign'
+    task = Task.objects.get(task_id=id)
+    if request.method == 'POST':
+        form = TaskAssignment(request.POST, instance = task)
+        if form.is_valid():
+            form.save()
+            return HttpResponseRedirect('/success')
+    else:
+        form = TaskAssignment(instance=task)
     context = {'action':action, 'form':form}
     return render(request, 'myapp430/taskform.html', context)
 
