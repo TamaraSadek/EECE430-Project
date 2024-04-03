@@ -211,5 +211,3 @@ def SignupEvent(request, id):
 def success(request):
     return render(request, 'myapp430/success.html')
 
-def testTamara():
-    return "nullTamara"
