@@ -88,6 +88,8 @@ def deleteEmployee(request, id):
 
 
 #Task Functions
+#create task
+
 # assign task
 def createTask(request):
     form = TaskForm()
