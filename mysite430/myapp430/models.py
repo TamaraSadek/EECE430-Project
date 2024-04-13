@@ -1,4 +1,5 @@
 from django.db import models
+from django.contrib.auth.models import User
 
 class Employee(models.Model):
 	CATEGORY = (
@@ -8,6 +9,8 @@ class Employee(models.Model):
 			('Well-being Specialist', 'Well-being Specialist'),
 			('HR Specialist','HR Specialist')
 			) 
+    
+    #user = models.OneToOneField(User, on_delete=models.CASCADE) //This will be needed eza la77a2na naamol authentication baaden
 	employee_id = models.AutoField(primary_key=True)
 	name = models.CharField(max_length=200)
 	phone = models.CharField(max_length=15, null=True)
@@ -33,7 +36,7 @@ class Task(models.Model):
 			('In Progress', 'In Progress'),
 			) 
 	task_id = models.AutoField(primary_key=True)
-	employees = models.ManyToManyField(Employee, blank = True)
+	employees = models.ManyToManyField(Employee, blank=True)
 	deadline=  models.DateTimeField()
 	points = models.IntegerField(default=0)
 	description = models.TextField()
@@ -65,10 +68,13 @@ def __str__(self):
 
 class Mood(models.Model): #- Mood DB (mood, date, employee, team id)
 	STATUS = (
-		('Complete', 'Complete'),
-		('In Progress', 'In Progress'),
+		('Awful', 'Awful'),
+		('Bad', 'Bad'),
+        ('Neutral', 'Neutral'),
+		('Good','Good'),
+        ('Amazing', 'Amazing'),
 		) 
-	mood=models.TextField()
+	mood = models.CharField(max_length=20, choices=STATUS)
 	employee = models.ForeignKey(Employee, on_delete= models.SET_NULL, null=True)
 	date = models.DateTimeField(auto_now_add=True, null=True, blank=True)
 	team_id = models.IntegerField(null=True)

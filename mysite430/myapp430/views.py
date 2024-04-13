@@ -6,6 +6,37 @@ from .forms import *
 from django.http import HttpResponseRedirect
 from django.db import transaction
 
+from django.contrib.auth.forms import AuthenticationForm
+from django.contrib.auth import login as auth_login
+from django.shortcuts import render, redirect
+from .forms import MoodForm
+from .models import Employee, Task, Mood
+from django.db.models import Count
+
+from django import template
+
+register = template.Library()
+
+@register.filter(name='percentage')
+def percentage(value, total):
+    if total == 0:
+        return 0
+    return round((value / total) * 100, 2)
+
+
+
+# Login
+def login(request):
+    if request.method == 'POST':
+        form = AuthenticationForm(request, request.POST)
+        if form.is_valid():
+            auth_login(request, form.get_user())
+            return redirect('/')
+    else:
+        form = AuthenticationForm()
+    return render(request, 'login.html', {'form': form})
+
+
 # Home Page
 def home(request):
     employees = Employee.objects.all().order_by('employee_id')
@@ -31,14 +62,102 @@ def home(request):
 # Employee Profile
 def viewEmployee(request, id):
     employee = Employee.objects.get(employee_id=id)
-    tasks = Task.objects.filter(employee=employee)
+    tasks = Task.objects.filter(employees=employee)
     total_tasks = tasks.count()
-    completed_tasks = tasks.filter(status='Complete').count()
-    if total_tasks > 0:
-        percent_completed = round((completed_tasks / total_tasks) * 100, 2)
+    #completed_tasks = tasks.filter(status='Complete').count()
+    completed_tasks = tasks.filter(status='Complete')
+    tasks_in_progress = tasks.exclude(status='Complete')
+    # Query mood data for the specific employee
+    mood_entries = Mood.objects.filter(employee=employee)
+
+    if total_tasks >0:
+        percent_completed = round((completed_tasks.count() / total_tasks) * 100, 2)
     else:
         percent_completed = 0
-    context = {'employee':employee, 'tasks':tasks, 'total_tasks':total_tasks, 'completed_tasks': completed_tasks, 'percent_completed': percent_completed}
+    #context = {'employee':employee, 'tasks':tasks, 'total_tasks':total_tasks, 'completed_tasks': completed_tasks, 'percent_completed': percent_completed}
+    
+    '''# Calculate percentage of recent mood entries for each mood category
+    mood_entries = Mood.objects.filter(employee=employee)
+    recent_mood_entries = mood_entries.order_by('-date')
+    mood_count = recent_mood_entries.count()
+    recent_mood_entries = recent_mood_entries[:10]  # Consider the 10 most recent mood entries
+    mood_analytics = {
+        'very_bad': recent_mood_entries.filter(mood='Very bad').count() / mood_count * 100,
+        'bad': recent_mood_entries.filter(mood='Bad').count() / mood_count * 100,
+        'neutral': recent_mood_entries.filter(mood='Neutral').count() / mood_count * 100,
+        'good': recent_mood_entries.filter(mood='Good').count() / mood_count * 100,
+        'very_good': recent_mood_entries.filter(mood='Very good').count() / mood_count * 100,
+        }'''
+    
+    '''
+    # Calculate percentage of recent mood entries for each mood category
+    mood_entries = Mood.objects.filter(employee=employee).order_by('-date')[:10]  # Get the 10 most recent mood entries
+    # Count the total number of recent mood entries
+    total_recent_mood_entries = mood_entries.count()
+    # Calculate the percentage of each mood category among the recent mood entries
+    mood_counts = mood_entries.values('mood').annotate(count=Count('mood'))
+    mood_analytics = {}
+    for mood_count in mood_counts:
+        mood_analytics[mood_count['mood']] = (mood_count['count'] / total_recent_mood_entries) * 100'''
+        
+    '''
+    # Calculate mood analytics
+    mood_analytics = mood_entries.values('mood').annotate(count=Count('id'))
+    total_moods = mood_entries.count()
+    mood_percentages = {}
+    for mood in Mood.STATUS:
+        mood_name = mood[0]
+        mood_count = mood_analytics.filter(mood=mood_name).first()
+    if mood_count is not None:
+        count = mood_count['count']
+        mood_percentages[mood_name] = round((count / total_moods) * 100, 2)
+    else:
+        mood_percentages[mood_name] = 0'''
+        
+    '''
+    # Calculate mood percentages
+    mood_counts = mood_entries.values('mood').annotate(count=Count('mood'))
+    total_moods = mood_entries.count()
+    mood_percentages = {}
+    for mood_count in mood_counts:
+        mood_percentages[mood_count['mood']] = round((mood_count['count'] / total_moods) * 100, 2)
+        '''
+    
+    # Calculate mood percentages
+    total_moods = mood_entries.count()
+    mood_percentages = {}
+    if total_moods > 0:
+        mood_percentages = {
+            'Awful': round((mood_entries.filter(mood='Awful').count() / total_moods) * 100, 2),
+            'Bad': round((mood_entries.filter(mood='Bad').count() / total_moods) * 100, 2),
+            'Neutral': round((mood_entries.filter(mood='Neutral').count() / total_moods) * 100, 2),
+            'Good': round((mood_entries.filter(mood='Good').count() / total_moods) * 100, 2),
+            'Amazing': round((mood_entries.filter(mood='Amazing').count() / total_moods) * 100, 2),
+        }
+    else:
+    # If there are no mood entries, set all mood percentages to 0
+        mood_percentages = {
+            'Awful': 0,
+            'Bad': 0,
+            'Neutral': 0,
+            'Good': 0,
+            'Amazing': 0,
+        }
+
+
+
+
+    
+    context = {
+        'employee': employee,
+        'total_tasks':total_tasks,
+        'tasks_in_progress': tasks_in_progress,
+        'completed_tasks': completed_tasks,
+        'percent_completed': percent_completed,
+        'mood_entries': mood_entries, # Include mood data in the context
+        'mood_percentages': mood_percentages,
+        # Add other context variables as needed
+    }
     return render(request, 'myapp430/employeeprofile.html', context)
 
 def totalCompletion():
@@ -210,6 +329,32 @@ def SignupEvent(request, id):
             return HttpResponseRedirect('/success')
     context = {'form': form, 'event': event}  # Pass the form and event to the template
     return render(request, 'myapp430/signupevent.html', context)
+
+'''def addMood(request, id):
+    if request.method == 'POST':
+        employee = Employee.objects.get(employee_id=id)
+        mood_form = MoodForm(request.POST)
+        if mood_form.is_valid():
+            mood_instance = mood_form.save(commit=False)
+            mood_instance.employee = employee
+            mood_instance.save()
+            return redirect('view employee', id=id)
+    else:
+        mood_form = MoodForm()
+    return render(request, 'myapp430/mood_form.html', {'form': mood_form})'''
+
+def add_mood(request, employee_id):
+    employee = Employee.objects.get(employee_id=employee_id)
+    if request.method == 'POST':
+        form = MoodForm(request.POST)
+        if form.is_valid():
+            mood = form.save(commit=False)
+            mood.employee = employee
+            mood.save()
+            return redirect('view employee', id=employee_id)
+    else:
+        form = MoodForm()
+    return render(request, 'myapp430/mood_form.html', {'form': form})
 
 # Successful Execution
 def success(request):

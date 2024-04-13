@@ -5,6 +5,19 @@
     <title>Home</title>
 </head>
 <body>
+    <nav>
+        <!-- Your navigation bar code here -->
+        <ul>
+            <li><a href="/">Home</a></li>
+            <!-- Other navigation links -->
+        </ul>
+        <!-- Logout button -->
+        <form action="{% url 'logout' %}" method="post">
+            {% csrf_token %}
+            <button type="submit">Logout</button>
+        </form>
+    </nav>
+
     <br>
 
     <div class="row">
@@ -19,6 +32,7 @@
                         <th>Employee</th>
                         <th>Tasks</th>
                     </tr>
+                    <!--
                     {% for employee in employees %}
                         <tr>
                             <td><a href="{% url 'view employee' employee.employee_id %}" class="btn btn-sm btn-info">View Employee</a></td>
@@ -28,6 +42,16 @@
 
                         </tr>
                     {% endfor %}
+                    -->
+                    {% for employee in employees %}
+                        <tr>
+                            <td><a href="{% url 'view employee' id=employee.employee_id %}" class="btn btn-sm btn-info">View Employee</a></td>
+                            <td>{{ employee.name }}</td>
+                            <td>{{ employee.tasks }}</td>
+                            <td><a href="{% url 'delete employee' employee.employee_id %}" class="btn btn-sm btn-info">Delete Employee</a></td>
+                        </tr>
+                    {% endfor %}
+
                 </table>
             </div>
         </div>
@@ -40,14 +64,23 @@
                 <table class="table table-sm" style="border-collapse: collapse;">
                     <tr>
                         <th style="border-right: 1px solid black; padding-right: 10px;">Task</th>
-                        <th style="border-right: 1px solid black; padding-right: 10px;">Assignee</th>
+                        <th style="border-right: 1px solid black; padding-right: 10px;">Assignees</th>
                         <th style="border-right: 1px solid black; padding-right: 10px;">Deadline</th>
                         <th style="padding-right: 10px;">Status</th>
                     </tr>
                     {% for task in tasks %}
                         <tr>
                             <td style="border-right: 1px solid black; padding-right: 10px; padding-left: 10px;">{{task.description}}</td>
-                            <td style="border-right: 1px solid black; padding-right: 10px;  padding-left: 10px;">{{task.employee}}</td>
+                            <td style="border-right: 1px solid black; padding-right: 10px; padding-left: 10px;">
+                                {% for employee in task.employees.all %}
+                                    {{ employee.name }}{% if not forloop.last %}, {% endif %}
+                                {% empty %}
+                                    No assignees
+                                {% endfor %}
+                            </td>
+                            
+
+                            <!-- <td style="border-right: 1px solid black; padding-right: 10px;  padding-left: 10px;">{{task.employee}}</td> -->
                             <td style="border-right: 1px solid black; padding-right: 10px;  padding-left: 10px;">{{task.deadline}}</td>
                             <td style="padding-right: 10px;  padding-left: 10px;">{{task.status}}</td>
                             <td><a class="btn btn-sm btn-warning" href="{% url 'update task' task.task_id %}" style="padding-right: 10px;">Update</a></td>
@@ -104,4 +137,6 @@
         </div>
     </div>
 </body>
+
+
 </html>

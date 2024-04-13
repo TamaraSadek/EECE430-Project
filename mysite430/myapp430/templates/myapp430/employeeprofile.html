@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -7,6 +8,7 @@
 <body>
     <br>
     <div class="row">
+        <!-- Employee Info -->
         <div class="col-md">
             <div class="card card-body">
                 <h3>Employee: {{employee.name}}</h3>
@@ -16,6 +18,7 @@
             </div>
         </div>
     
+        <!-- Contact Information -->
         <div class="col-md">
             <div class="card card-body">
                 <h4>Contact Information</h4>
@@ -30,6 +33,7 @@
             </div>
         </div>
     
+        <!-- Total Tasks -->
         <div class="col-md">
             <div class="card card-body">
                 <h4>Total Tasks: </h4>
@@ -37,6 +41,8 @@
                 <h2 style="text-align: center;padding: 10px">{{total_tasks}}</h2>
             </div>
         </div>
+
+        <!--
         <div class="col-md">
             <div class="card card-body">
                 <h4>Completed Tasks: </h4>
@@ -44,6 +50,9 @@
                 <h2 style="text-align: center;padding: 10px">{{completed_tasks}}</h2>
             </div>
         </div>
+        -->
+
+        <!-- Percent Completion -->
         <div class="col-md">
             <div class="card card-body">
                 <h4>Percent Completion: </h4>
@@ -51,6 +60,91 @@
                 <h2 style="text-align: center;padding: 10px">{{percent_completed}}%</h2>
             </div>
         </div>
+
+        <!--
+        <div class="col-md">
+            <div class="card card-body">
+                <h4>Tasks Assigned to {{ employee.name }}</h4>
+                <ul>
+                    {% for task in tasks %}
+                        <li>{{ task.description }}</li>
+                        
+                    {% endfor %}
+                </ul>
+            </div>
+        </div>
+        -->
+
+        <!-- Tasks In Progress -->
+        <div class="col-md">
+            <div class="card card-body">
+                <h4>Tasks In Progress</h4>
+                <hr>
+                <ul>
+                    {% for task in tasks_in_progress %}
+                        <li>{{ task.description }} - Deadline: {{ task.deadline }}</li>
+                        <!-- Display other task information as needed -->
+                    {% endfor %}
+                </ul>
+            </div>
+        </div>
+        
+        <!-- Completed Tasks -->
+        <div class="col-md">
+            <div class="card card-body">
+                <h4>Completed Tasks</h4>
+                <hr>
+                <ul>
+                    {% for task in completed_tasks %}
+                        <li>{{ task.description }} - Deadline: {{ task.deadline }}</li>
+                        <!-- Display other task information as needed -->
+                    {% endfor %}
+                </ul>
+            </div>
+        </div>
+
+        <!-- Mood Tracker -->
+        <div class="col-md">
+            <div class="card card-body">
+                <h4>Mood Tracker</h4>
+                <hr>
+                <a class="btn btn-primary btn-sm btn-block" href="{% url 'add mood' employee.employee_id %}">Add Mood</a>
+                <hr>
+                <h5>Recent Mood Entries:</h5>
+                <ul>
+                    {% for mood_entry in mood_entries %}
+                        <li>{{ mood_entry.get_mood_display }} - {{ mood_entry.date }}</li>
+                    {% endfor %}
+                </ul>
+            </div>
+        </div>
+
+        <!-- Mood Analytics -->
+        <div class="row">
+            <div class="col-md">
+                <div class="card card-body">
+                    <h4>Mood Analytics</h4>
+                    <hr>
+                    <p>Awful: {{ mood_percentages.Awful }}%</p>
+                    <p>Bad: {{ mood_percentages.Bad }}%</p>
+                    <p>Neutral: {{ mood_percentages.Neutral }}%</p>
+                    <p>Good: {{ mood_percentages.Good }}%</p>
+                    <p>Amazing: {{ mood_percentages.Amazing }}%</p>
+                </div>
+            </div>
+        </div>
+
+
+
+
+
+
+
+
+
+
+
+
     </div>      
 </body>
 </html>

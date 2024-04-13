@@ -1,12 +1,19 @@
-from django.urls import path
+from django.urls import path, include
 from . import views
 ##from django.conf.urls import url
 from django.urls import re_path as url
 from .views import *
+from .views import login
+from django.contrib.auth.views import LogoutView
+
 
 urlpatterns = [
+    path('login/', login, name='login'),
+    path('logout/', LogoutView.as_view(), name='logout'),
     path('', views.home, name="home page"),
-    path('employee profile/<int:id>/', views.viewEmployee, name="view employee"),
+    path('employee profile/<int:id>/', views.viewEmployee, name="view employee"),\
+    path('add-mood/<int:employee_id>/', add_mood, name='add mood'),
+    #path('add mood/<int:id>/', addMood, name="add mood"),
     path('create employee/', views.createEmployee, name="create employee"),
     path('update employee/<int:id>/', views.updateEmployee, name="update employee"),
     path('delete employee/<int:id>/', views.deleteEmployee, name="delete employee"),

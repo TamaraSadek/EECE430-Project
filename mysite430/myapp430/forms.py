@@ -1,5 +1,6 @@
 from django.forms import ModelForm, CheckboxSelectMultiple
-from .models import Employee, Task,Goals, Mood,Events, Gifts,Team
+from django import forms
+from .models import Employee, Task, Goals, Mood, Events, Gifts,Team
 
 class TaskForm(ModelForm):
     class Meta:
@@ -32,7 +33,11 @@ class GoalsForm(ModelForm):
 class MoodForm(ModelForm):
     class Meta:
         model = Mood
-        fields = ["mood","employee", "team_id"]
+        #fields = ["mood","employee", "team_id"]
+        fields = ['mood']
+        widgets = {
+            'mood': forms.Select(choices=Mood.STATUS),
+        }
 
 class GiftsForm(ModelForm):
     class Meta:

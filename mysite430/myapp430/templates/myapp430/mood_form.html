@@ -1,0 +1,29 @@
+<!-- mood_form.html -->
+
+<!--
+<form method="post">
+    {% csrf_token %}
+    <div class="form-group">
+        <label for="id_mood">Mood:</label>
+        {{ form.mood }}
+    </div>
+    <button type="submit" class="btn btn-primary">Submit</button>
+</form>
+-->
+
+<!-- add_mood.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Add Mood</title>
+</head>
+<body>
+    <h2>Add Mood</h2>
+    <form method="post">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit">Submit</button>
+    </form>
+</body>
+</html>
