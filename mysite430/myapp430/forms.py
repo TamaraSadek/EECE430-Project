@@ -1,6 +1,23 @@
 from django.forms import ModelForm, CheckboxSelectMultiple
 from django import forms
-from .models import Employee, Task, Goals, Mood, Events, Gifts,Team
+from .models import Employee, Task, Goals, Mood, Events, Gifts,Team,EventRegistration
+from django.contrib.auth.forms import UserCreationForm
+from django import forms
+from django.contrib.auth.models import User
+
+class RegisterForm(UserCreationForm):
+    email = forms.EmailField(required=True)  # Add an email field
+
+    class Meta:
+        model = User
+        fields = ("username", "email", "password1", "password2")
+
+    def save(self, commit=True):
+        user = super(RegisterForm, self).save(commit=False)
+        user.email = self.cleaned_data["email"]
+        if commit:
+            user.save()
+        return user
 
 class TaskForm(ModelForm):
     class Meta:
@@ -24,6 +41,12 @@ class EventsForm(ModelForm):
         widgets = {
             'participants': CheckboxSelectMultiple,  # Render as checkboxes for multiple selection
         }
+
+class EventRegistrationForm(ModelForm):
+    class Meta:
+        model=EventRegistration
+        fields=['event', 'participant']
+
 
 class GoalsForm(ModelForm):
     class Meta:

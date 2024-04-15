@@ -12,8 +12,13 @@ from django.shortcuts import render, redirect
 from .forms import MoodForm
 from .models import Employee, Task, Mood
 from django.db.models import Count
-
+from django.contrib.auth.decorators import login_required
 from django import template
+from .models import Employee
+from django.shortcuts import render, redirect
+from .forms import RegisterForm
+from .models import Employee
+
 
 register = template.Library()
 
@@ -30,11 +35,31 @@ def login(request):
     if request.method == 'POST':
         form = AuthenticationForm(request, request.POST)
         if form.is_valid():
+            user = form.get_user()
             auth_login(request, form.get_user())
-            return redirect('/')
+            if Employee.objects.filter(user=user).exists():
+                return redirect('/')  # Redirect to homepage or dashboard
+            else:
+                # Optional: Logout the user if they're not an employee
+                # from django.contrib.auth import logout
+                # logout(request)
+                return redirect('not_employee') 
     else:
         form = AuthenticationForm()
     return render(request, 'login.html', {'form': form})
+
+
+def register(request):
+    if request.method == 'POST':
+        form = RegisterForm(request.POST)
+        if form.is_valid():
+            user = form.save()
+            # Create an Employee instance for the new user
+            Employee.objects.create(user=user)
+            return redirect('login')  # Redirect them to the login page
+    else:
+        form = RegisterForm()
+    return render(request, 'register.html', {'form': form})
 
 
 # Home Page
@@ -312,21 +337,24 @@ def SignupEvent(request, id):
     context = {'form': form, 'event': event}  # Pass the form and event to the template
     return render(request, 'myapp430/signupevent.html', context)
 '''
+#@login_required
 def SignupEvent(request, id):
     event = Events.objects.get(event_id=id)
-    current_employee = request.user.employee
-    form = EventsForm()  # Create an empty form
+    current_user = request.user# Retrieve the Employee instance associated with the current user
+    current_employee = Employee.objects.get(user=current_user)
+    form = EventRegistrationForm()  # Create an empty form
     if request.method == 'POST':
-        form = EventsForm(request.POST)
+        form = EventRegistrationForm(request.POST)
         if form.is_valid():
             # check if the current employee is already registered for the event
-            if EventRegistration.objects.filter(event=event, participant=current_employee).exists():
+            #if EventRegistration.objects.filter(event=event, participant=current_employee).exists():
                 # handle the case where the employee is already registered
-                return HttpResponseRedirect('/already_registered') 
+                #return HttpResponseRedirect('/already_registered') 
     
             event_registration = EventRegistration(event=event, participant=current_employee)
             event_registration.save()
             return HttpResponseRedirect('/success')
+ 
     context = {'form': form, 'event': event}  # Pass the form and event to the template
     return render(request, 'myapp430/signupevent.html', context)
 

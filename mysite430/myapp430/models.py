@@ -9,8 +9,6 @@ class Employee(models.Model):
 			('Well-being Specialist', 'Well-being Specialist'),
 			('HR Specialist','HR Specialist')
 			) 
-    
-    #user = models.OneToOneField(User, on_delete=models.CASCADE) //This will be needed eza la77a2na naamol authentication baaden
 	employee_id = models.AutoField(primary_key=True)
 	name = models.CharField(max_length=200)
 	phone = models.CharField(max_length=15, null=True)
@@ -19,6 +17,7 @@ class Employee(models.Model):
 	team_id = models.IntegerField(null=True) # should this be from Team DB?? 
 	address=models.CharField(max_length=200, null=True)
 	points=models.IntegerField(default=0)
+	user = models.OneToOneField(User, on_delete=models.CASCADE, null=True, blank=True)
 
 	def __str__(self):
 		return self.name
