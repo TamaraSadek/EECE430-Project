@@ -5,6 +5,8 @@ from .models import *
 from .forms import * 
 from django.http import HttpResponseRedirect
 from django.db import transaction
+from django.conf import settings
+import os
 
 from django.contrib.auth.forms import AuthenticationForm
 from django.contrib.auth import login as auth_login
@@ -383,6 +385,13 @@ def add_mood(request, employee_id):
     else:
         form = MoodForm()
     return render(request, 'myapp430/mood_form.html', {'form': form})
+
+def logo_image_view(request):
+    image_path = os.path.join(settings.BASE_DIR, 'static', 'logo.png')
+    with open(image_path, 'rb') as f:
+        return HttpResponse(f.read(), content_type='image/png')
+    
+
 
 # Successful Execution
 def success(request):

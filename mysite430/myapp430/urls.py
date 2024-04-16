@@ -28,4 +28,5 @@ urlpatterns = [
     path('delete event/<int:id>/', views.deleteEvent, name="delete event"),
     path('signup event/<int:id>/', views.SignupEvent, name="Signup event"),
     path('register/', register, name='register'),
-    url('success/', success), ]
+    url('success/', success),
+    path('logo/', views.logo_image_view, name='logo_image'),]
