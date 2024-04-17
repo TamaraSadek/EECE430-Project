@@ -6,10 +6,12 @@ from .views import *
 from .views import login
 from django.contrib.auth.views import LogoutView
 from .views import register
+from .views import signup
 
 
 
 urlpatterns = [
+    path('signup/', signup, name='signup'),
     path('login/', login, name='login'),
     path('logout/', LogoutView.as_view(), name='logout'),
     path('', views.home, name="home page"),

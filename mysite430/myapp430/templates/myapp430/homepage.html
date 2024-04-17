@@ -112,9 +112,9 @@
 <body>
     {% load static %}
     <nav>
-        
+
         <div class="logo">
-            <img src = "{% static 'myapp430/logo3.png' %}" alt="My image"/>
+            <img src="{% static 'myapp430/logo3.png' %}" alt="My image" />
         </div>
         <ul>
             <li><a href="/">Home</a></li>
@@ -124,6 +124,10 @@
         <form action="{% url 'logout' %}" method="post">
             {% csrf_token %}
             <button type="submit" class="btn">Logout</button>
+        </form>
+        <form action="{% url 'signup' %}" method="post">
+            {% csrf_token %}
+            <button type="submit" class="btn">signup</button>
         </form>
     </nav>
 

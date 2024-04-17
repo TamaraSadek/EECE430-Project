@@ -16,10 +16,11 @@ from .models import Employee, Task, Mood
 from django.db.models import Count
 from django.contrib.auth.decorators import login_required
 from django import template
-from .models import Employee
 from django.shortcuts import render, redirect
 from .forms import RegisterForm
-from .models import Employee
+from .forms import EmployeeForm, SignUpForm
+
+
 
 
 register = template.Library()
@@ -32,24 +33,33 @@ def percentage(value, total):
 
 
 
-# Login
 def login(request):
     if request.method == 'POST':
         form = AuthenticationForm(request, request.POST)
         if form.is_valid():
             user = form.get_user()
-            auth_login(request, form.get_user())
+            auth_login(request, user)
             if Employee.objects.filter(user=user).exists():
                 return redirect('/')  # Redirect to homepage or dashboard
             else:
-                # Optional: Logout the user if they're not an employee
-                # from django.contrib.auth import logout
-                # logout(request)
-                return redirect('not_employee') 
+                # Redirect to employee creation page
+                return redirect('create employee')  # Make sure you have a URL named 'createEmployee'
     else:
         form = AuthenticationForm()
     return render(request, 'login.html', {'form': form})
 
+from .forms import SignUpForm, EmployeeForm
+
+def signup(request):
+    if request.method == 'POST':
+        form = SignUpForm(request.POST)
+        if form.is_valid():
+            user = form.save()
+            auth_login(request, user)  # Log in the newly created user
+            return redirect('create employee')  # Redirect to the employee profile creation
+    else:
+        form = SignUpForm()
+    return render(request, 'signup.html', {'form': form})
 
 def register(request):
     if request.method == 'POST':
@@ -198,18 +208,31 @@ def totalCompletion():
 
 # Employee Functions
 # create employee
-def createEmployee(request):
-    form = EmployeeForm()
-    action = 'create'
-    if request.method == 'POST':
-        form = EmployeeForm(request.POST)
-        if form.is_valid():
-            formdata = form.cleaned_data
-            form.save()
-            return HttpResponseRedirect('/success')
-    context = {'action':action, 'form':form}
-    return render(request, 'myapp430/employeeform.html', context)
 
+#def createEmployee(request):
+ #   form = EmployeeForm()
+  #  action = 'create'
+   # if request.method == 'POST':
+    #    form = EmployeeForm(request.POST)
+     #   if form.is_valid():
+      #      formdata = form.cleaned_data
+       #     form.save()
+        #    return HttpResponseRedirect('/success')
+    #context = {'action':action, 'form':form}
+    #return render(request, 'myapp430/employeeform.html', context)
+def createEmployee(request):
+    if not request.user.is_authenticated:
+        return redirect('login')
+    if Employee.objects.filter(user=request.user).exists():
+        return redirect('view employee')
+    form = EmployeeForm(request.POST or None)
+    if request.method == 'POST':
+        if form.is_valid():
+            employee = form.save(commit=False)
+            employee.user = request.user  # Link employee to the logged-in user
+            employee.save()
+            return HttpResponseRedirect('/success')  
+    return render(request, 'myapp430/employeeform.html', {'form': form})
 # update employee info 
 def updateEmployee(request, id):
     action = 'update'
@@ -342,8 +365,7 @@ def SignupEvent(request, id):
 #@login_required
 def SignupEvent(request, id):
     event = Events.objects.get(event_id=id)
-    current_user = request.user# Retrieve the Employee instance associated with the current user
-    current_employee = Employee.objects.get(user=current_user)
+    current_user = request.user.employee# Retrieve the Employee instance associated with the current user
     form = EventRegistrationForm()  # Create an empty form
     if request.method == 'POST':
         form = EventRegistrationForm(request.POST)
@@ -353,7 +375,7 @@ def SignupEvent(request, id):
                 # handle the case where the employee is already registered
                 #return HttpResponseRedirect('/already_registered') 
     
-            event_registration = EventRegistration(event=event, participant=current_employee)
+            event_registration = EventRegistration(event=event, participant=current_user)
             event_registration.save()
             return HttpResponseRedirect('/success')
  
