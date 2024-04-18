@@ -1,6 +1,6 @@
 from django.forms import ModelForm, CheckboxSelectMultiple
 from django import forms
-from .models import Employee, Task, Goals, Mood, Events, Gifts,Team,EventRegistration
+from .models import Employee, Task, Goals, Mood, Events, Rewards, Team, EventRegistration
 from django.contrib.auth.forms import UserCreationForm
 from django import forms
 from django.contrib.auth.models import User
@@ -32,7 +32,7 @@ class TaskAssignment(ModelForm):
 class EmployeeForm(ModelForm):
 	class Meta:
 		model = Employee
-		fields = ["name", "phone", "email", "position", "team_id", "address"]
+		fields = ["name", "phone", "email", "position", "team", "address"]
 
 class EventsForm(ModelForm):
     class Meta:
@@ -42,35 +42,28 @@ class EventsForm(ModelForm):
             'participants': CheckboxSelectMultiple,  # Render as checkboxes for multiple selection
         }
 
-class EventRegistrationForm(ModelForm):
-    class Meta:
-        model=EventRegistration
-        fields=['event', 'participant']
-
-
 class GoalsForm(ModelForm):
     class Meta:
         model = Goals
-        fields = ["goal_id","employee", "deadline","points","description","status"]
+        fields = ["employee", "deadline","description","status"]
 
 class MoodForm(ModelForm):
     class Meta:
         model = Mood
-        #fields = ["mood","employee", "team_id"]
         fields = ['mood']
         widgets = {
             'mood': forms.Select(choices=Mood.STATUS),
         }
 
-class GiftsForm(ModelForm):
+class RewardsForm(ModelForm):
     class Meta:
-        model = Gifts
-        fields = ["gift_name","description","stock","price"]
+        model = Rewards
+        fields = ["reward_name","description","stock","price"]
 
 class TeamForm(ModelForm):
     class Meta:
         model = Team
-        fields = ["team_id","members","description","team_name"]
+        fields = ["team_id", "description", "team_name"]
 
 class SignUpForm(UserCreationForm):
     email = forms.EmailField(max_length=254, help_text='Required. Inform a valid email address.')

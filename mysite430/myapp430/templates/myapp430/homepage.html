@@ -71,6 +71,9 @@
                 border: none;
                 border-radius: 5px;
                 cursor: pointer;
+                margin-right: 5px; 
+                margin-top: 10px;
+                font-size: 18px;
             }
     
             .btn:hover {
@@ -116,18 +119,13 @@
         <div class="logo">
             <img src="{% static 'myapp430/logo3.png' %}" alt="My image" />
         </div>
-        <ul>
-            <li><a href="/">Home</a></li>
-            <!-- Other navigation links -->
-        </ul>
-        <!-- Logout button -->
         <form action="{% url 'logout' %}" method="post">
             {% csrf_token %}
             <button type="submit" class="btn">Logout</button>
         </form>
         <form action="{% url 'signup' %}" method="post">
             {% csrf_token %}
-            <button type="submit" class="btn">signup</button>
+            <button type="submit" class="btn">Sign Up</button>
         </form>
     </nav>
 
@@ -145,7 +143,6 @@
                 <div class="card">
                     <h3>Employees ({{total_employees}})</h3>
                     <hr>
-                    <a href="{% url 'create employee' %}" class="btn">Create Employee</a>
                     <table>
                         <tr>
                             <th></th>
@@ -194,7 +191,7 @@
                                 <td>
                                     <a href="{% url 'update task' task.task_id %}" class="btn">Update</a>
                                     <a href="{% url 'delete task' task.task_id %}" class="btn">Delete</a>
-                                    <a href="{% url 'assign task' task.task_id %}" class="btn">Assign Task</a>
+                                    <a href="{% url 'assign task' task.task_id %}" class="btn">Assign</a>
                                 </td>
                             </tr>
                         {% endfor %}
@@ -232,7 +229,7 @@
                                 <td>
                                     <a href="{% url 'update Event' event.event_id %}" class="btn">Update</a>
                                     <a href="{% url 'delete event' event.event_id %}" class="btn">Delete</a>
-                                    <a href="{% url 'Signup event' event.event_id %}" class="btn">Sign Up</a>
+                                    <button onclick="signupForEvent('{{ event.event_id }}')" class="btn">Sign Up</button>
                                 </td>
                             </tr>
                         {% endfor %}
@@ -240,6 +237,29 @@
                 </div>
             </div>
         </div>
+        <script>
+            function signupForEvent(eventId) {
+                fetch(`/signup_event/${eventId}/`, {
+                    method: 'POST',
+                    headers: {
+                        'X-CSRFToken': '{{ csrf_token }}', 
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json'
+                    },
+                    credentials: 'same-origin' 
+                })
+                .then(response => {
+                    if (response.ok) {
+                        window.location.href = '/success';
+                    } else {
+                        console.error('Failed to sign up for event');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error signing up for event:', error);
+                });
+            }
+        </script>
     </div>
 
     <script>

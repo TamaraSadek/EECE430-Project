@@ -19,6 +19,8 @@ from django import template
 from django.shortcuts import render, redirect
 from .forms import RegisterForm
 from .forms import EmployeeForm, SignUpForm
+from django.http import JsonResponse
+
 
 
 
@@ -112,54 +114,7 @@ def viewEmployee(request, id):
     else:
         percent_completed = 0
     #context = {'employee':employee, 'tasks':tasks, 'total_tasks':total_tasks, 'completed_tasks': completed_tasks, 'percent_completed': percent_completed}
-    
-    '''# Calculate percentage of recent mood entries for each mood category
-    mood_entries = Mood.objects.filter(employee=employee)
-    recent_mood_entries = mood_entries.order_by('-date')
-    mood_count = recent_mood_entries.count()
-    recent_mood_entries = recent_mood_entries[:10]  # Consider the 10 most recent mood entries
-    mood_analytics = {
-        'very_bad': recent_mood_entries.filter(mood='Very bad').count() / mood_count * 100,
-        'bad': recent_mood_entries.filter(mood='Bad').count() / mood_count * 100,
-        'neutral': recent_mood_entries.filter(mood='Neutral').count() / mood_count * 100,
-        'good': recent_mood_entries.filter(mood='Good').count() / mood_count * 100,
-        'very_good': recent_mood_entries.filter(mood='Very good').count() / mood_count * 100,
-        }'''
-    
-    '''
-    # Calculate percentage of recent mood entries for each mood category
-    mood_entries = Mood.objects.filter(employee=employee).order_by('-date')[:10]  # Get the 10 most recent mood entries
-    # Count the total number of recent mood entries
-    total_recent_mood_entries = mood_entries.count()
-    # Calculate the percentage of each mood category among the recent mood entries
-    mood_counts = mood_entries.values('mood').annotate(count=Count('mood'))
-    mood_analytics = {}
-    for mood_count in mood_counts:
-        mood_analytics[mood_count['mood']] = (mood_count['count'] / total_recent_mood_entries) * 100'''
         
-    '''
-    # Calculate mood analytics
-    mood_analytics = mood_entries.values('mood').annotate(count=Count('id'))
-    total_moods = mood_entries.count()
-    mood_percentages = {}
-    for mood in Mood.STATUS:
-        mood_name = mood[0]
-        mood_count = mood_analytics.filter(mood=mood_name).first()
-    if mood_count is not None:
-        count = mood_count['count']
-        mood_percentages[mood_name] = round((count / total_moods) * 100, 2)
-    else:
-        mood_percentages[mood_name] = 0'''
-        
-    '''
-    # Calculate mood percentages
-    mood_counts = mood_entries.values('mood').annotate(count=Count('mood'))
-    total_moods = mood_entries.count()
-    mood_percentages = {}
-    for mood_count in mood_counts:
-        mood_percentages[mood_count['mood']] = round((mood_count['count'] / total_moods) * 100, 2)
-        '''
-    
     # Calculate mood percentages
     total_moods = mood_entries.count()
     mood_percentages = {}
@@ -180,10 +135,6 @@ def viewEmployee(request, id):
             'Good': 0,
             'Amazing': 0,
         }
-
-
-
-
     
     context = {
         'employee': employee,
@@ -208,18 +159,6 @@ def totalCompletion():
 
 # Employee Functions
 # create employee
-
-#def createEmployee(request):
- #   form = EmployeeForm()
-  #  action = 'create'
-   # if request.method == 'POST':
-    #    form = EmployeeForm(request.POST)
-     #   if form.is_valid():
-      #      formdata = form.cleaned_data
-       #     form.save()
-        #    return HttpResponseRedirect('/success')
-    #context = {'action':action, 'form':form}
-    #return render(request, 'myapp430/employeeform.html', context)
 def createEmployee(request):
     if not request.user.is_authenticated:
         return redirect('login')
@@ -269,7 +208,7 @@ def createTask(request):
     context = {'action':action, 'form':form}
     return render(request, 'myapp430/taskform.html', context)
 
-# assign task
+#assign task
 def assignTask(request, id):
     action = 'assign'
     task = Task.objects.get(task_id=id)
@@ -348,52 +287,27 @@ def deleteEvent(request, id):
         return HttpResponseRedirect('/success')
     return render(request, 'myapp430/deleteitem.html', {'item':Event})
 
-'''
-def SignupEvent(request, id):
-    event = Events.objects.get(event_id=id)
-    form = EventsForm()  # Create an empty form
-    if request.method == 'POST':
-        form = EventsForm(request.POST)
-        if form.is_valid():
-            current_employee = request.user.employee
-            event.participants.add(current_employee)
-            return HttpResponseRedirect('/success')
-
-    context = {'form': form, 'event': event}  # Pass the form and event to the template
-    return render(request, 'myapp430/signupevent.html', context)
-'''
 #@login_required
 def SignupEvent(request, id):
     event = Events.objects.get(event_id=id)
-    current_user = request.user.employee# Retrieve the Employee instance associated with the current user
-    form = EventRegistrationForm()  # Create an empty form
-    if request.method == 'POST':
-        form = EventRegistrationForm(request.POST)
-        if form.is_valid():
-            # check if the current employee is already registered for the event
-            #if EventRegistration.objects.filter(event=event, participant=current_employee).exists():
-                # handle the case where the employee is already registered
-                #return HttpResponseRedirect('/already_registered') 
-    
-            event_registration = EventRegistration(event=event, participant=current_user)
-            event_registration.save()
-            return HttpResponseRedirect('/success')
- 
-    context = {'form': form, 'event': event}  # Pass the form and event to the template
-    return render(request, 'myapp430/signupevent.html', context)
 
-'''def addMood(request, id):
-    if request.method == 'POST':
-        employee = Employee.objects.get(employee_id=id)
-        mood_form = MoodForm(request.POST)
-        if mood_form.is_valid():
-            mood_instance = mood_form.save(commit=False)
-            mood_instance.employee = employee
-            mood_instance.save()
-            return redirect('view employee', id=id)
-    else:
-        mood_form = MoodForm()
-    return render(request, 'myapp430/mood_form.html', {'form': mood_form})'''
+    if not request.user.is_authenticated or not hasattr(request.user, 'employee'):
+        return JsonResponse({'error': 'User is not authenticated or does not have an associated employee'}, status=401)
+    
+    current_user = request.user
+
+    # Check if the current employee is already registered for the event
+    if EventRegistration.objects.filter(event=event, participant=current_user).exists():
+        return redirect('/already_registered')
+
+    # Create EventRegistration object for the current user and event
+    event_registration = EventRegistration(event=event, participant=current_user)
+    event_registration.save()
+
+    return JsonResponse({'message': 'Event signup successful'})
+
+def already_registered(request):
+    return render(request, 'myapp430/alreadyregistered.html')
 
 def add_mood(request, employee_id):
     employee = Employee.objects.get(employee_id=employee_id)
@@ -413,7 +327,6 @@ def logo_image_view(request):
     with open(image_path, 'rb') as f:
         return HttpResponse(f.read(), content_type='image/png')
     
-
 
 # Successful Execution
 def success(request):
