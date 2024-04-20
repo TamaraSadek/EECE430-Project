@@ -20,6 +20,8 @@ from django.shortcuts import render, redirect
 from .forms import RegisterForm
 from .forms import EmployeeForm, SignUpForm
 from django.http import JsonResponse
+from django.contrib.auth import authenticate, login, logout
+from django.contrib import messages
 
 
 
@@ -35,20 +37,44 @@ def percentage(value, total):
 
 
 
-def login(request):
+'''def login(request):
     if request.method == 'POST':
         form = AuthenticationForm(request, request.POST)
         if form.is_valid():
-            user = form.get_user()
-            auth_login(request, user)
-            if Employee.objects.filter(user=user).exists():
-                return redirect('/')  # Redirect to homepage or dashboard
-            else:
-                # Redirect to employee creation page
-                return redirect('create employee')  # Make sure you have a URL named 'createEmployee'
+            username = form.cleaned_data.get('username')
+            password = form.cleaned_data.get('password')
+            user = authenticate(request, username=username, password=password)
+            if user is not None:
+                auth_login(request, user)  # Log in the user
+                if Employee.objects.filter(user=user).exists():
+                    return redirect('/')  # Redirect to homepage or dashboard
+                else:
+                    return redirect('signup')  # Make sure you have a URL named 'createEmployee'
     else:
         form = AuthenticationForm()
+    return render(request, 'login.html', {'form': form})'''
+
+def loginPage(request):
+
+    if request.method == 'POST':
+        form = LoginForm(request, data=request.POST)
+        if form.is_valid():
+            username = form.cleaned_data.get('username')
+            password = form.cleaned_data.get('password')
+            user = authenticate(request, username=username, password=password)
+            if user is not None:
+                auth_login(request, user)
+                return redirect('/')
+            else:
+                form.add_error(None, 'Username or password incorrect.')
+    else:
+        form = LoginForm()
     return render(request, 'login.html', {'form': form})
+
+
+def logoutUser(request):
+    logout(request)
+    return redirect('login')
 
 from .forms import SignUpForm, EmployeeForm
 
@@ -86,6 +112,7 @@ def home(request):
     complete_tasks = Task.objects.filter(status='Complete').count()
     pending_tasks = Task.objects.filter(status='In Progress').count()
     completion_percentage = totalCompletion()
+    resources = Resource.objects.all() 
     context = {
         'employees': employees,
         'tasks': tasks,
@@ -95,6 +122,7 @@ def home(request):
         'complete': complete_tasks,
         'in_progress': pending_tasks,  # Fix the key name to match the template
         'completion_percentage' : completion_percentage,
+        'resources' :resources,
     }
     return render(request, 'myapp430/homepage.html', context)
 
@@ -327,6 +355,37 @@ def logo_image_view(request):
     with open(image_path, 'rb') as f:
         return HttpResponse(f.read(), content_type='image/png')
     
+
+from .forms import ResourceForm
+from .models import Resource
+def create_resource(request):
+    form = ResourceForm()
+    if request.method == 'POST':
+        form = ResourceForm(request.POST)
+        if form.is_valid():
+            form.save()
+            return redirect('/success')  # Redirect to a success page or a resource list
+    return render(request, 'myapp430/resource_form.html', {'form': form})
+
+def update_resource(request, resource_id):
+    resource = Resource.objects.get(resource_id=resource_id)
+    form = ResourceForm(instance=resource)  # Pass the instance to the form
+    
+    if request.method == 'POST':
+        form = ResourceForm(request.POST, instance=resource)
+        if form.is_valid():
+            form.save()
+            return HttpResponseRedirect('/success')
+    
+    return render(request, 'myapp430/resource_form.html', {'form': form})
+
+def delete_resource(request, resource_id):
+    resource = Resource.objects.get(resource_id=resource_id)
+    if request.method == 'POST':
+        resource.delete()  # Delete the resource on POST
+        return HttpResponseRedirect('/success')  # Redirect to success page or list
+    
+    return render(request, 'myapp430/deleteitem.html', {'item': resource})
 
 # Successful Execution
 def success(request):

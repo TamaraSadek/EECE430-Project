@@ -117,6 +117,19 @@ class Events(models.Model): #- Events DB (event id,event name, description, date
 	def clean(self):
 		if self.date < timezone.now():
 			raise ValidationError("Date must be in the future.")
+		
+class Resource(models.Model):
+	resource_id = models.AutoField(primary_key=True)
+	resource_name = models.TextField()
+	resource_description = models.TextField()
+	link = models.URLField(blank=True, null=True)  # New field for links
+	created_at = models.DateTimeField(auto_now_add=True)
+	updated_at = models.DateTimeField(auto_now=True)
+	last_modified = models.DateTimeField(auto_now=True)  # New field for last modification time
+
+	def __str__(self):
+		return self.resource_name
+
 
 class EventRegistration(models.Model):
 	event = models.ForeignKey(Events, on_delete=models.CASCADE)

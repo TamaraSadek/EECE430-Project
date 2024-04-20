@@ -262,6 +262,42 @@
         </script>
     </div>
 
+
+    <div class="row">
+        <div class="col-md">
+            <div class="card">
+                <h3>List of Wellness Resources</h3>
+                <hr>
+                <a href="{% url 'create_resource' %}" class="btn">Add Resource</a>
+                <table>
+                    <tr>
+                        <th>Wellness Resource Name</th>
+                        <th>Description</th>
+                        <th>Link</th> <!-- New column -->
+                        <th>Last Modified</th> <!-- New column -->
+                    </tr>
+                    {% for resource in resources %}
+                        <tr>
+                            <td>{{ resource.resource_name }}</td>
+                            <td>{{ resource.resource_description }}</td>
+                            <td><a href="{{ resource.link }}" target="_blank">Open Link</a></td> <!-- New link field -->
+                            <td>{{ resource.last_modified }}</td> <!-- New timestamp field -->
+                            <td>
+                                <a href="{% url 'update_resource' resource.resource_id %}" class="btn">Update</a>
+                                <a href="{% url 'delete_resource' resource.resource_id %}" class="btn">Delete</a>
+                            </td>
+                        </tr>
+                    {% empty %}
+                        <tr>
+                            <td colspan="3">No resources found</td>
+                        </tr>   
+                    {% endfor %}
+                </table>
+            </div>
+        </div>
+    </div>
+
+
     <script>
         function refreshPage() {
             location.reload();

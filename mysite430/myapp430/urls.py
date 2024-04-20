@@ -13,8 +13,8 @@ from .views import signup
 urlpatterns = [
     path('signup/', signup, name='signup'),
     path('register/', register, name='register'),
-    path('login/', login, name='login'),
-    path('logout/', LogoutView.as_view(), name='logout'),
+    path('login/', loginPage, name='login'),
+    path('logout/', logoutUser, name='logout'),
     path('', views.home, name="home page"),
 
     path('employee profile/<int:id>/', views.viewEmployee, name="view employee"),\
@@ -33,6 +33,10 @@ urlpatterns = [
     path('update event/<int:id>/', views.updateEvent,name="update Event"),
     path('delete event/<int:id>/', views.deleteEvent, name="delete event"),
     path('signup_event/<int:id>/', views.SignupEvent, name="Signup_event"),
+
+    path('create_resource/', views.create_resource, name='create_resource'),
+    path('update_resource/<int:resource_id>/', views.update_resource, name='update_resource'),
+    path('delete_resource/<int:resource_id>/', views.delete_resource, name='delete_resource'),
 
     url('success/', success),
     path('logo/', views.logo_image_view, name='logo_image'),]

@@ -1,9 +1,10 @@
 from django.forms import ModelForm, CheckboxSelectMultiple
 from django import forms
-from .models import Employee, Task, Goals, Mood, Events, Rewards, Team, EventRegistration
+from .models import Employee, Task, Goals, Mood, Events, Rewards, Team, EventRegistration, Resource
 from django.contrib.auth.forms import UserCreationForm
 from django import forms
 from django.contrib.auth.models import User
+from django.contrib.auth.forms import AuthenticationForm
 
 class RegisterForm(UserCreationForm):
     email = forms.EmailField(required=True)  # Add an email field
@@ -18,6 +19,15 @@ class RegisterForm(UserCreationForm):
         if commit:
             user.save()
         return user
+    
+class LoginForm(AuthenticationForm):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields['username'].widget.attrs.update({'class': 'form-control'})
+        self.fields['password'].widget.attrs.update({'class': 'form-control'})
+
+    class Meta:
+        fields = ['username', 'password']
 
 class TaskForm(ModelForm):
     class Meta:
@@ -64,6 +74,11 @@ class TeamForm(ModelForm):
     class Meta:
         model = Team
         fields = ["team_id", "description", "team_name"]
+
+class ResourceForm(ModelForm):
+    class Meta:
+        model = Resource
+        fields = ["resource_name", "resource_description", "link"]
 
 class SignUpForm(UserCreationForm):
     email = forms.EmailField(max_length=254, help_text='Required. Inform a valid email address.')
