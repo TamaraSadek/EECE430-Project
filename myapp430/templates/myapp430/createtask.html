@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Create Task</title>
+</head>
+<body>
+    <div class="row">
+        <div class="col-md-6">
+            <div class="card card-body">
+                <h3>Create Task</h3>
+                <a class="btn btn-primary btn-sm btn-block" href="{% url 'home page' %}">Home</a>
+                <form action="" method="POST">
+                    {% csrf_token %}
+                    <label for="description">Description:</label><br>
+                    <textarea id="description" name="description" rows="4" cols="50">{{ form.description.value }}</textarea><br>
+                    <label for="deadline">Deadline:</label><br>
+                    <input type="datetime-local" id="deadline" name="deadline" value="{{ form.deadline.value|date:'Y-m-d\TH:i' }}"><br>
+                    <!-- Remove the status field completely from the create task form -->
+                    <input type="submit" value="Submit" class="btn">
+                </form>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

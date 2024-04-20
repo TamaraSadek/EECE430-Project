@@ -1,0 +1,310 @@
+<!DOCTYPE html>
+{% load static %}
+
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Home</title>
+        <style>
+            body {
+                font-family: Arial, sans-serif;
+                margin: 0;
+                padding: 0;
+                background-color: #f0f0f0;
+            }
+    
+            nav {
+                background-color: #333;
+                padding:20px;
+                color: #fff;
+            }
+    
+            nav ul {
+                list-style-type: none;
+                padding: 0;
+                margin: 0;
+            }
+    
+            nav ul li {
+                display: inline;
+                margin-right: 10px;
+            }
+    
+            nav ul li a {
+                color: #fff;
+                text-decoration: none;
+            }
+    
+            .container {
+                max-width: 1200px;
+                margin: 20px auto;
+                padding: 20px;
+                background-color: #fff;
+                box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            }
+    
+            .row {
+                display: flex;
+                flex-wrap: wrap;
+                margin-top: 20px;
+            }
+    
+            .col-md-5, .col-md-7 {
+                flex: 0 0 calc(50% - 20px);
+                margin-right: 20px;
+                margin-bottom: 20px;
+            }
+    
+            .card {
+                background-color: #f9f9f9;
+                padding: 20px;
+                border-radius: 5px;
+            }
+    
+            .btn {
+                display: inline-block;
+                padding: 8px 16px;
+                text-decoration: none;
+                background-color: #45BE93;
+                color: #fff;
+                border: none;
+                border-radius: 5px;
+                cursor: pointer;
+                margin-right: 5px; 
+                margin-top: 10px;
+                font-size: 18px;
+            }
+    
+            .btn:hover {
+                background-color: #287058;
+            }
+
+            .logo {
+                display: flex;
+                justify-content: center;
+                /*margin-right: auto; Pushes the logo to the left */
+            }
+
+            .logo img {
+                height: 150px; /* Adjust the height of the logo */
+                width: auto; /* Maintain aspect ratio */
+            }
+
+    
+            table {
+                width: 100%;
+                border-collapse: collapse;
+                margin-top: 10px;
+            }
+    
+            th, td {
+                padding: 10px;
+                border-bottom: 1px solid #ddd;
+                text-align: left;
+            }
+    
+            th {
+                background-color: #f2f2f2;
+            }
+    
+        </style>
+    </head>
+
+
+<body>
+    {% load static %}
+    <nav>
+
+        <div class="logo">
+            <img src="{% static 'myapp430/logo3.png' %}" alt="My image" />
+        </div>
+        <form action="{% url 'logout' %}" method="post">
+            {% csrf_token %}
+            <button type="submit" class="btn">Logout</button>
+        </form>
+        <form action="{% url 'signup' %}" method="post">
+            {% csrf_token %}
+            <button type="submit" class="btn">Sign Up</button>
+        </form>
+    </nav>
+
+    <br>
+    
+    <div class="container">
+
+        <!-- Welcome message -->
+        <div class="welcome-message">
+            <h2>Welcome back, Manager!</h2>
+        </div>
+
+        <div class="row">
+            <div class="col-md-5">
+                <div class="card">
+                    <h3>Employees ({{total_employees}})</h3>
+                    <hr>
+                    <table>
+                        <tr>
+                            <th></th>
+                            <th>Employee</th>
+                            <th>Tasks</th>
+                            <th>Action</th>
+                        </tr>
+                        {% for employee in employees %}
+                            <tr>
+                                <td><a href="{% url 'view employee' id=employee.employee_id %}" class="btn">View</a></td>
+                                <td>{{ employee.name }}</td>
+                                <td>{{ employee.tasks }}</td>
+                                <td><a href="{% url 'delete employee' employee.employee_id %}" class="btn">Delete</a></td>
+                            </tr>
+                        {% endfor %}
+                    </table>
+                </div>
+            </div>
+
+
+            <div class="col-md-7">
+                <div class="card">
+                    <h3>List of Tasks</h3>
+                    <hr>
+                    <a href="{% url 'create task' %}" class="btn">Add Task</a>
+                    <table>
+                        <tr>
+                            <th>Task</th>
+                            <th>Assignees</th>
+                            <th>Deadline</th>
+                            <th>Status</th>
+                            <th>Action</th>
+                        </tr>
+                        {% for task in tasks %}
+                            <tr>
+                                <td>{{ task.description }}</td>
+                                <td>
+                                    {% for employee in task.employees.all %}
+                                        {{ employee.name }}{% if not forloop.last %}, {% endif %}
+                                    {% empty %}
+                                        No assignees
+                                    {% endfor %}
+                                </td>
+                                <td>{{ task.deadline }}</td>
+                                <td>{{ task.status }}</td>
+                                <td>
+                                    <a href="{% url 'update task' task.task_id %}" class="btn">Update</a>
+                                    <a href="{% url 'delete task' task.task_id %}" class="btn">Delete</a>
+                                    <a href="{% url 'assign task' task.task_id %}" class="btn">Assign</a>
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md">
+                <div class="card">
+                    <h3>Task Completion Percentage: {{completion_percentage}}%</h3>
+                    <hr>
+                    <button onclick="refreshPage()" class="btn">Refresh</button>
+                </div>
+
+                <div class="card">
+                    <h3>List of Events</h3>
+                    <hr>
+                    <a href="{% url 'add event' %}" class="btn">Add Event</a>
+                    <table>
+                        <tr>
+                            <th>Event Name</th>
+                            <th>Description</th>
+                            <th>Date</th>
+                            <th>Location</th>
+                            <th>Action</th>
+                        </tr>
+                        {% for event in events %}
+                            <tr>
+                                <td>{{ event.event_name }}</td>
+                                <td>{{ event.description }}</td>
+                                <td>{{ event.date }}</td>
+                                <td>{{ event.location }}</td>
+                                <td>
+                                    <a href="{% url 'update Event' event.event_id %}" class="btn">Update</a>
+                                    <a href="{% url 'delete event' event.event_id %}" class="btn">Delete</a>
+                                    <button onclick="signupForEvent('{{ event.event_id }}')" class="btn">Sign Up</button>
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </table>
+                </div>
+            </div>
+        </div>
+        <script>
+            function signupForEvent(eventId) {
+                fetch(`/signup_event/${eventId}/`, {
+                    method: 'POST',
+                    headers: {
+                        'X-CSRFToken': '{{ csrf_token }}', 
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json'
+                    },
+                    credentials: 'same-origin' 
+                })
+                .then(response => {
+                    if (response.ok) {
+                        window.location.href = '/success';
+                    } else {
+                        console.error('Failed to sign up for event');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error signing up for event:', error);
+                });
+            }
+        </script>
+    </div>
+
+
+    <div class="row">
+        <div class="col-md">
+            <div class="card">
+                <h3>List of Wellness Resources</h3>
+                <hr>
+                <a href="{% url 'create_resource' %}" class="btn">Add Resource</a>
+                <table>
+                    <tr>
+                        <th>Wellness Resource Name</th>
+                        <th>Description</th>
+                        <th>Link</th> <!-- New column -->
+                        <th>Last Modified</th> <!-- New column -->
+                    </tr>
+                    {% for resource in resources %}
+                        <tr>
+                            <td>{{ resource.resource_name }}</td>
+                            <td>{{ resource.resource_description }}</td>
+                            <td><a href="{{ resource.link }}" target="_blank">Open Link</a></td> <!-- New link field -->
+                            <td>{{ resource.last_modified }}</td> <!-- New timestamp field -->
+                            <td>
+                                <a href="{% url 'update_resource' resource.resource_id %}" class="btn">Update</a>
+                                <a href="{% url 'delete_resource' resource.resource_id %}" class="btn">Delete</a>
+                            </td>
+                        </tr>
+                    {% empty %}
+                        <tr>
+                            <td colspan="3">No resources found</td>
+                        </tr>   
+                    {% endfor %}
+                </table>
+            </div>
+        </div>
+    </div>
+
+
+    <script>
+        function refreshPage() {
+            location.reload();
+        }
+    </script>
+
+</body>
+
+
+</html>
