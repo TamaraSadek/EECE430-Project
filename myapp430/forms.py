@@ -5,6 +5,10 @@ from django.contrib.auth.forms import UserCreationForm
 from django import forms
 from django.contrib.auth.models import User
 from django.contrib.auth.forms import AuthenticationForm
+from .models import Booking
+
+
+from .models import Employee
 
 class RegisterForm(UserCreationForm):
     email = forms.EmailField(required=True)  # Add an email field
@@ -85,3 +89,17 @@ class SignUpForm(UserCreationForm):
     class Meta:
         model = User
         fields = ('username', 'email', 'password1', 'password2')
+
+from .models import Booking, Employee
+
+class BookingForm(forms.ModelForm):
+    def __init__(self, *args, **kwargs):
+        position = kwargs.pop('position', None)
+        super().__init__(*args, **kwargs)
+        if position:
+            self.fields['specialist'].queryset = Employee.objects.filter(position=position)
+
+    class Meta:
+        model = Booking
+        fields = ['employee', 'specialist', 'date', 'time', 'is_confirmed']
+

@@ -37,6 +37,8 @@ urlpatterns = [
     path('create_resource/', views.create_resource, name='create_resource'),
     path('update_resource/<int:resource_id>/', views.update_resource, name='update_resource'),
     path('delete_resource/<int:resource_id>/', views.delete_resource, name='delete_resource'),
+    path('book_session/', book_session, name='book_session'),
+    path('booking_confirmation/<int:booking_id>/', views.booking_confirmation, name='booking_confirmation'),
 
     url('success/', success),
     path('logo/', views.logo_image_view, name='logo_image'),]

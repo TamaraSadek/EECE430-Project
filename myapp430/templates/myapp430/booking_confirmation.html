@@ -1,9 +1,12 @@
+{% load static %}
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Resource Form</title>
+    <title>Booking Confirmation</title>
+    <link rel="stylesheet" type="text/css" href="{% static 'css/styles.css' %}"> <!-- Link external stylesheets -->
     <style>
+        /* Add custom inline styles here */
         body {
             font-family: Arial, sans-serif;
             margin: 0;
@@ -19,52 +22,26 @@
             box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
         }
 
-        h1 {
-            text-align: center;
-        }
-
-        form {
-            margin-left: 20px;
-        }
-
         .btn {
             display: inline-block;
             padding: 8px 16px;
-            text-decoration: none;
             background-color: #45BE93;
             color: #fff;
-            border: none;
             border-radius: 5px;
+            text-decoration: none;
             cursor: pointer;
-            margin-right: 5px; 
-            margin-top: 10px;
-            font-size: 18px;
         }
 
         .btn:hover {
             background-color: #287058;
         }
-
-        .logo {
-            display: flex;
-            justify-content: center;
-            margin-top: 20px;
-        }
-
-        .logo img {
-            height: 150px; 
-            width: auto; 
-        }
     </style>
 </head>
 <body>
     <div class="container">
-        <h1>Resource Form</h1>
-        <form method="post">
-            {% csrf_token %}
-            {{ form.as_p }}
-            <button type="submit" class="btn">Submit</button>
-        </form>
+        <h2>Booking Confirmed</h2>
+        <p>Your session booking has been confirmed.</p>
+        <a class="btn" href="{% url 'home page' %}">Home</a>
     </div>
 </body>
 </html>

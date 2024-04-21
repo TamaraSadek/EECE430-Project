@@ -1,8 +1,7 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-    <meta charset="UTF-8">
-    <title>Resource Form</title>
+    <title>Book Session</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -58,13 +57,17 @@
     </style>
 </head>
 <body>
-    <div class="container">
-        <h1>Resource Form</h1>
-        <form method="post">
-            {% csrf_token %}
-            {{ form.as_p }}
-            <button type="submit" class="btn">Submit</button>
-        </form>
-    </div>
+    <h2>Book a Session</h2>
+    <form method="post">
+        {% csrf_token %}
+        <label for="id_position">Position:</label>
+        <select name="position" id="id_position">
+            <option value="Well-being Specialist">Well-being Specialist</option>
+            <!-- Add other options as needed -->
+        </select>
+        <br><br>
+        {{ form.as_p }}
+        <button type="submit", class="btn">Book Session</button>
+    </form>
 </body>
 </html>

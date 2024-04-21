@@ -154,3 +154,14 @@ class Rewards(models.Model):
 	def clean(self):
 		if self.stock < 0 or self.price < 0:
 			raise ValidationError("Cannot be negative.")
+
+class Booking(models.Model):
+    booking_id = models.AutoField(primary_key=True)
+    employee = models.ForeignKey(User, related_name='bookings', on_delete=models.CASCADE)
+    specialist = models.ForeignKey('Employee', related_name='session_bookings', on_delete=models.CASCADE)
+    date = models.DateField()
+    time = models.TimeField()
+    is_confirmed = models.BooleanField(default=False)
+
+    def __str__(self):
+        return f"Booking for {self.employee.username} with {self.specialist.name} on {self.date} at {self.time}"

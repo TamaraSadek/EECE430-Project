@@ -7,7 +7,8 @@ from django.http import HttpResponseRedirect
 from django.db import transaction
 from django.conf import settings
 import os
-
+import os
+from django.shortcuts import render
 from django.contrib.auth.forms import AuthenticationForm
 from django.contrib.auth import login as auth_login
 from django.shortcuts import render, redirect
@@ -24,7 +25,9 @@ from django.contrib.auth import authenticate, login, logout
 from django.contrib import messages
 
 
+# views.py
 
+from django.shortcuts import render
 
 
 register = template.Library()
@@ -35,24 +38,42 @@ def percentage(value, total):
         return 0
     return round((value / total) * 100, 2)
 
+# views.py
 
+from django.shortcuts import render, redirect
+from .forms import BookingForm
+from .models import Booking
+from django.urls import reverse
 
-'''def login(request):
+def book_session(request):
+    # Assuming 'Well-being Specialist' is the desired position
+    position = 'Well-being Specialist'
+    
+    # Get the specialist based on the position
+    specialist = Employee.objects.filter(position=position).first()
+    
     if request.method == 'POST':
-        form = AuthenticationForm(request, request.POST)
+        form = BookingForm(request.POST)
         if form.is_valid():
-            username = form.cleaned_data.get('username')
-            password = form.cleaned_data.get('password')
-            user = authenticate(request, username=username, password=password)
-            if user is not None:
-                auth_login(request, user)  # Log in the user
-                if Employee.objects.filter(user=user).exists():
-                    return redirect('/')  # Redirect to homepage or dashboard
-                else:
-                    return redirect('signup')  # Make sure you have a URL named 'createEmployee'
+            booking = form.save(commit=False)
+            # Assuming the logged-in user is the employee
+            booking.employee = request.user
+            booking.specialist = specialist
+            booking.save()
+            return redirect(reverse('booking_confirmation', kwargs={'booking_id': booking.booking_id}))
     else:
-        form = AuthenticationForm()
-    return render(request, 'login.html', {'form': form})'''
+        form = BookingForm()
+    
+    return render(request, 'book_session.html', {'form': form})
+
+from myapp430.models import Booking
+
+
+def booking_confirmation(request, booking_id):
+    booking = Booking.objects.get(booking_id=booking_id)
+    return render(request, 'booking_confirmation.html', {'booking': booking})
+
+
 
 def loginPage(request):
 
@@ -104,6 +125,7 @@ def register(request):
 
 # Home Page
 def home(request):
+    user_name = request.user.get_full_name() or request.user.username
     employees = Employee.objects.all().order_by('employee_id')
     tasks = Task.objects.all()
     events = Events.objects.all()  # Retrieve all events
@@ -113,7 +135,14 @@ def home(request):
     pending_tasks = Task.objects.filter(status='In Progress').count()
     completion_percentage = totalCompletion()
     resources = Resource.objects.all() 
+
+
+    # Iterate through all tasks and append them to the appropriate list
+    in_progress_tasks = Task.objects.filter(status='In Progress').order_by('deadline')
+    completed_tasks = Task.objects.filter(status='Complete')
+
     context = {
+        'user_name': user_name,
         'employees': employees,
         'tasks': tasks,
         'events': events,  # Add events to the context
@@ -123,6 +152,8 @@ def home(request):
         'in_progress': pending_tasks,  # Fix the key name to match the template
         'completion_percentage' : completion_percentage,
         'resources' :resources,
+        'in_progress_tasks': in_progress_tasks,  # Add in_progress_tasks to the context
+        'completed_tasks': completed_tasks,   
     }
     return render(request, 'myapp430/homepage.html', context)
 
@@ -163,6 +194,19 @@ def viewEmployee(request, id):
             'Good': 0,
             'Amazing': 0,
         }
+
+    user = employee.user
+    
+    if not employee.user:
+        # Handle the case where Employee has no associated User
+        context['upcoming_sessions'] = None
+    else:
+        # Retrieve bookings for the User associated with this Employee
+        upcoming_sessions = Booking.objects.filter(
+            employee=employee.user,
+            date__gte=timezone.now()
+        ).order_by('date')
+
     
     context = {
         'employee': employee,
@@ -172,7 +216,7 @@ def viewEmployee(request, id):
         'percent_completed': percent_completed,
         'mood_entries': mood_entries, # Include mood data in the context
         'mood_percentages': mood_percentages,
-        # Add other context variables as needed
+        'upcoming_sessions': upcoming_sessions
     }
     return render(request, 'myapp430/employeeprofile.html', context)
 

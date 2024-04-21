@@ -233,7 +233,27 @@
             </div>
         </div>
 
-    </div>  
+    </div> 
+    
+    <!-- Upcoming Wellness Sessions -->
+    <div class="row">
+        <div class="container">
+            <div class="col-md">
+                <div class="card card-body">
+                    <h4>Upcoming Wellness Sessions</h4>
+                    <hr>
+                    <ul>
+                        {% for session in upcoming_sessions %}
+                            <li>With {{ session.specialist }} at {{ session.date }} : {{ session.time }}</li>
+                        {% empty %}
+                            <li>No upcoming sessions</li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+    
     
     
     
