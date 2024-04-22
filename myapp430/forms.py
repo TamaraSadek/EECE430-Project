@@ -77,7 +77,7 @@ class RewardsForm(ModelForm): # used for adding a reward in the shop -- not impl
 class TeamForm(ModelForm): # used for adding/updating a team -- not implemented yet
     class Meta:
         model = Team
-        fields = ["team_id", "description", "team_name"]
+        fields = ["team_id", "team_name", "description"]
 
 class ResourceForm(ModelForm): # used for adding/updating a resource
     class Meta:

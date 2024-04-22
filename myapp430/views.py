@@ -9,14 +9,12 @@ from django.conf import settings
 import os
 from django.contrib.auth.forms import AuthenticationForm
 from django.contrib.auth import login as auth_login
-from .forms import MoodForm
+from .forms import MoodForm, RegisterForm, EmployeeForm, SignUpForm
 from .models import Employee, Task, Mood
 from django.db.models import Count
 from django.contrib.auth.decorators import login_required
 from django import template
 from django.shortcuts import render, redirect
-from .forms import RegisterForm
-from .forms import EmployeeForm, SignUpForm
 from django.http import JsonResponse
 from django.contrib.auth import authenticate, login, logout
 from django.contrib import messages
@@ -360,6 +358,7 @@ def SignupEvent(request, id): # sign up to an event in the list
 def already_registered(request):
     return render(request, 'myapp430/alreadyregistered.html')
 
+
 # Mood Functions
 def add_mood(request, employee_id): # input your current mood
     employee = Employee.objects.get(employee_id=employee_id)
@@ -379,6 +378,7 @@ def logo_image_view(request): # display logo on homepage
     with open(image_path, 'rb') as f:
         return HttpResponse(f.read(), content_type='image/png')
     
+
 # Resources Functions
 from .forms import ResourceForm
 from .models import Resource
@@ -388,7 +388,7 @@ def create_resource(request): # create a new resource
         form = ResourceForm(request.POST)
         if form.is_valid():
             form.save()
-            return redirect('/success')  # Redirect to a success page or a resource list
+            return redirect('/success')
     return render(request, 'myapp430/resource_form.html', {'form': form})
 
 def update_resource(request, resource_id): # update an existing resource element
@@ -410,6 +410,18 @@ def delete_resource(request, resource_id): # delete an existing resource
         return HttpResponseRedirect('/success')  # Redirect to success page or list
     
     return render(request, 'myapp430/deleteitem.html', {'item': resource})
+
+
+# Team Functions
+def createTeam(request):
+    if request.method == 'POST':
+        form = TeamForm(request.POST)
+        if form.is_valid():
+            form.save()
+            return redirect('/success')
+    else:
+        form = TeamForm()
+    return render(request, 'myapp430/create_team.html', {'form': form})
 
 # Successful Execution. Returned whenever any of the above functions executes successfully
 def success(request):

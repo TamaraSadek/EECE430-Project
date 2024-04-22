@@ -107,6 +107,10 @@
         th {
             background-color: #f2f2f2;
         }
+
+        .center {
+            text-align: center;
+        }
     </style>
 </head>
 
@@ -135,25 +139,29 @@
         <!-- Welcome message -->
         <div class="welcome-message">
             <h2>Welcome, {{ user_name }}!</h2>
+            <td><a href="{% url 'view employee' id=request.user.employee.employee_id %}" class="btn">View Your Profile</a></td>
         </div>
 
         <div class="row">
             <div class="col-md-5">
                 <div class="card">
                     <h3>Employees ({{total_employees}})</h3>
+                    <a href="{% url 'create_team' %}" class="btn">Create Team</a>
                     <hr>
                     <table>
                         <tr>
                             <th></th>
-                            <th>Employee</th>
-                            <th>Tasks</th>
-                            <th>Action</th>
+                            <th class="center">Employee</th>
+                            <th class="center">Team</th>
+                            <th class="center">Tasks</th>
+                            <th class="center">Action</th>
                         </tr>
                         {% for employee in employees %}
                         <tr>
                             <td><a href="{% url 'view employee' id=employee.employee_id %}" class="btn">View</a></td>
-                            <td>{{ employee.name }}</td>
-                            <td>{{ employee.tasks }}</td>
+                            <td class="center">{{ employee.name }}</td>
+                            <td class="center">{{ employee.team }}</td>
+                            <td class="center">{{ employee.tasks }}</td>
                             <td><a href="{% url 'delete employee' employee.employee_id %}" class="btn">Delete</a></td>
                         </tr>
                         {% endfor %}
