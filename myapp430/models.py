@@ -4,7 +4,7 @@ from django.core.validators import MinValueValidator, RegexValidator
 from django.core.exceptions import ValidationError
 from django.utils import timezone
 
-# Team DB( team name, members, team leader, description)
+# Team DB (team id, description, team name)
 class Team(models.Model):
 	team_id = models.IntegerField(primary_key=True)
 	description = models.TextField()
@@ -13,6 +13,7 @@ class Team(models.Model):
 	def __str__(self):
 		return self.team_name
 
+# Employee DB (employee id, employee name, employee phone number, employee email, employee position, employee team, employee address, employee points, employee user)
 class Employee(models.Model):
 	CATEGORY = (
 			('Employee', 'Employee'),
@@ -29,7 +30,7 @@ class Employee(models.Model):
 	team = models.ForeignKey(Team, on_delete=models.SET_NULL, null=True)  
 	address = models.CharField(max_length=200, null=True)
 	points = models.IntegerField(default=0, validators=[MinValueValidator(0)])
-	user = models.OneToOneField(User, on_delete=models.CASCADE, null=True, blank=True)
+	user = models.OneToOneField(User, on_delete=models.CASCADE, null=True, blank=True) # for login/sign up purposes
 
 	def clean(self):
 		if self.phone and not self.phone.isdigit():
@@ -48,9 +49,8 @@ class Employee(models.Model):
 		task_count = self.task_set.all().count()
 		return str(task_count)
 	
-
+# Task DB (task id, assigned employees, dealine, points awarded after completion, description, status, date created, credited)
 class Task(models.Model):
-
 	STATUS = (
 			('Complete', 'Complete'),
 			('In Progress', 'In Progress'),
@@ -71,24 +71,7 @@ class Task(models.Model):
 		if self.points < 0:
 			raise ValidationError("Points can't be negative.")
 
-class Goals(models.Model):
-	STATUS = (
-		('Complete', 'Complete'),
-		('In Progress', 'In Progress'),
-		) 
-	goal_id = models.AutoField(primary_key=True)
-	employee = models.ForeignKey(Employee, on_delete= models.SET_NULL, null=True)
-	deadline=  models.DateTimeField()
-	description = models.TextField()
-	status = models.CharField(choices=STATUS, default='In Progress', max_length=11)
-	date_created = models.DateTimeField(auto_now_add=True, null=True, blank=True)
-
-	def __str__(self):
-		return self.description
-	def clean(self):
-		if self.deadline <= timezone.now():
-			raise ValidationError("Deadline must be in the future.")
-
+# Mood DB (mood, employee, date added, team)
 class Mood(models.Model): #- Mood DB (mood, date, employee, team id)
 	STATUS = (
 		('Awful', 'Awful'),
@@ -105,7 +88,8 @@ class Mood(models.Model): #- Mood DB (mood, date, employee, team id)
 	def __str__(self):
 		return self.mood
 
-class Events(models.Model): #- Events DB (event id,event name, description, date, location)
+# Events DB (event is, event name, event description, date, location)
+class Events(models.Model):
 	event_id = models.AutoField(primary_key=True)
 	event_name = models.TextField()
 	description = models.TextField()
@@ -117,20 +101,8 @@ class Events(models.Model): #- Events DB (event id,event name, description, date
 	def clean(self):
 		if self.date < timezone.now():
 			raise ValidationError("Date must be in the future.")
-		
-class Resource(models.Model):
-	resource_id = models.AutoField(primary_key=True)
-	resource_name = models.TextField()
-	resource_description = models.TextField()
-	link = models.URLField(blank=True, null=True)  # New field for links
-	created_at = models.DateTimeField(auto_now_add=True)
-	updated_at = models.DateTimeField(auto_now=True)
-	last_modified = models.DateTimeField(auto_now=True)  # New field for last modification time
 
-	def __str__(self):
-		return self.resource_name
-
-
+# Event Registration DB (event object, participant object, registration date)
 class EventRegistration(models.Model):
 	event = models.ForeignKey(Events, on_delete=models.CASCADE)
 	participant = models.ForeignKey(User, on_delete=models.CASCADE)
@@ -141,8 +113,21 @@ class EventRegistration(models.Model):
 
 	def __str__(self):
 		return self.event_name
+		
+# Resources DB (resource id, resource name, resource description, link, date created, date updated, date modified)
+class Resource(models.Model):
+	resource_id = models.AutoField(primary_key=True)
+	resource_name = models.TextField()
+	resource_description = models.TextField()
+	link = models.URLField(blank=True, null=True) 
+	created_at = models.DateTimeField(auto_now_add=True)
+	updated_at = models.DateTimeField(auto_now=True)
+	last_modified = models.DateTimeField(auto_now=True) 
 
-#- Rewards DB (reward tname, description, price(points), stock)
+	def __str__(self):
+		return self.resource_name
+
+# Rewards DB (reward tname, description, stock, price in points) -- not yet implemented
 class Rewards(models.Model): 
 	reward_name = models.TextField()
 	description = models.TextField()
@@ -155,6 +140,7 @@ class Rewards(models.Model):
 		if self.stock < 0 or self.price < 0:
 			raise ValidationError("Cannot be negative.")
 
+# Bookings DB (booking id, employee object, specialist object, date of appointment, time of appointment, confirmation field)
 class Booking(models.Model):
     booking_id = models.AutoField(primary_key=True)
     employee = models.ForeignKey(User, related_name='bookings', on_delete=models.CASCADE)
