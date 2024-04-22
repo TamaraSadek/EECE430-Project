@@ -1,5 +1,5 @@
 from multiprocessing import Event
-from django.shortcuts import render,redirect
+from django.shortcuts import render, redirect
 from django.http import HttpResponse
 from .models import *
 from .forms import * 
@@ -7,11 +7,8 @@ from django.http import HttpResponseRedirect
 from django.db import transaction
 from django.conf import settings
 import os
-import os
-from django.shortcuts import render
 from django.contrib.auth.forms import AuthenticationForm
 from django.contrib.auth import login as auth_login
-from django.shortcuts import render, redirect
 from .forms import MoodForm
 from .models import Employee, Task, Mood
 from django.db.models import Count
@@ -24,12 +21,7 @@ from django.http import JsonResponse
 from django.contrib.auth import authenticate, login, logout
 from django.contrib import messages
 
-
 # views.py
-
-from django.shortcuts import render
-
-
 register = template.Library()
 
 @register.filter(name='percentage')
@@ -38,14 +30,12 @@ def percentage(value, total):
         return 0
     return round((value / total) * 100, 2)
 
-# views.py
-
-from django.shortcuts import render, redirect
 from .forms import BookingForm
 from .models import Booking
 from django.urls import reverse
 
-def book_session(request):
+def book_session(request): # book a wellness session with a well-being specialist
+
     # Assuming 'Well-being Specialist' is the desired position
     position = 'Well-being Specialist'
     
@@ -68,14 +58,11 @@ def book_session(request):
 
 from myapp430.models import Booking
 
-
-def booking_confirmation(request, booking_id):
+def booking_confirmation(request, booking_id): # confirm your booking
     booking = Booking.objects.get(booking_id=booking_id)
     return render(request, 'booking_confirmation.html', {'booking': booking})
 
-
-
-def loginPage(request):
+def loginPage(request): # login to a previously created account
 
     if request.method == 'POST':
         form = LoginForm(request, data=request.POST)
@@ -85,7 +72,7 @@ def loginPage(request):
             user = authenticate(request, username=username, password=password)
             if user is not None:
                 auth_login(request, user)
-                return redirect('/')
+                return redirect('/') # home page
             else:
                 form.add_error(None, 'Username or password incorrect.')
     else:
@@ -93,19 +80,19 @@ def loginPage(request):
     return render(request, 'login.html', {'form': form})
 
 
-def logoutUser(request):
+def logoutUser(request): # logout from currently signed in account
     logout(request)
-    return redirect('login')
+    return redirect('login') #return to login page
 
 from .forms import SignUpForm, EmployeeForm
 
-def signup(request):
+def signup(request): # sign up into a new account (creating a user)
     if request.method == 'POST':
         form = SignUpForm(request.POST)
         if form.is_valid():
             user = form.save()
             auth_login(request, user)  # Log in the newly created user
-            return redirect('create employee')  # Redirect to the employee profile creation
+            return redirect('create employee')  # creating an employee from that user
     else:
         form = SignUpForm()
     return render(request, 'signup.html', {'form': form})
@@ -125,19 +112,22 @@ def register(request):
 
 # Home Page
 def home(request):
-    user_name = request.user.get_full_name() or request.user.username
-    employees = Employee.objects.all().order_by('employee_id')
-    tasks = Task.objects.all()
+    user_name = request.user.get_full_name() or request.user.username # Display logged in user's name
+    employees = Employee.objects.all().order_by('employee_id') # Retrieve all employees
+    tasks = Task.objects.all() # Retrieve all tasks
     events = Events.objects.all()  # Retrieve all events
+
+    # Retrieve Task Completion Percentage
     total_employees = employees.count()
     total_tasks = tasks.count()
     complete_tasks = Task.objects.filter(status='Complete').count()
     pending_tasks = Task.objects.filter(status='In Progress').count()
     completion_percentage = totalCompletion()
-    resources = Resource.objects.all() 
+    resources = Resource.objects.all() # Retrieve all resources
 
 
     # Iterate through all tasks and append them to the appropriate list
+    # We now have in progress tasks listed first (in increasing order of deadline) followed by completed tasks
     in_progress_tasks = Task.objects.filter(status='In Progress').order_by('deadline')
     completed_tasks = Task.objects.filter(status='Complete')
 
@@ -157,12 +147,21 @@ def home(request):
     }
     return render(request, 'myapp430/homepage.html', context)
 
+def totalCompletion(): # compute percentage of tasks that have been completed (helper function)
+    total_tasks = Task.objects.count()
+    completed_tasks = Task.objects.filter(status='Complete').count()
+    if total_tasks > 0:
+        completion_percentage = (completed_tasks / total_tasks) * 100
+    else:
+        completion_percentage = 0
+    return round(completion_percentage, 2)
+
+
 # Employee Profile
-def viewEmployee(request, id):
-    employee = Employee.objects.get(employee_id=id)
+def viewEmployee(request, id): # display all necessary features on employee profile
+    employee = Employee.objects.get(employee_id=id) 
     tasks = Task.objects.filter(employees=employee)
     total_tasks = tasks.count()
-    #completed_tasks = tasks.filter(status='Complete').count()
     completed_tasks = tasks.filter(status='Complete')
     tasks_in_progress = tasks.exclude(status='Complete')
     # Query mood data for the specific employee
@@ -172,7 +171,6 @@ def viewEmployee(request, id):
         percent_completed = round((completed_tasks.count() / total_tasks) * 100, 2)
     else:
         percent_completed = 0
-    #context = {'employee':employee, 'tasks':tasks, 'total_tasks':total_tasks, 'completed_tasks': completed_tasks, 'percent_completed': percent_completed}
         
     # Calculate mood percentages
     total_moods = mood_entries.count()
@@ -186,7 +184,6 @@ def viewEmployee(request, id):
             'Amazing': round((mood_entries.filter(mood='Amazing').count() / total_moods) * 100, 2),
         }
     else:
-    # If there are no mood entries, set all mood percentages to 0
         mood_percentages = {
             'Awful': 0,
             'Bad': 0,
@@ -198,10 +195,8 @@ def viewEmployee(request, id):
     user = employee.user
     
     if not employee.user:
-        # Handle the case where Employee has no associated User
         context['upcoming_sessions'] = None
     else:
-        # Retrieve bookings for the User associated with this Employee
         upcoming_sessions = Booking.objects.filter(
             employee=employee.user,
             date__gte=timezone.now()
@@ -214,24 +209,14 @@ def viewEmployee(request, id):
         'tasks_in_progress': tasks_in_progress,
         'completed_tasks': completed_tasks,
         'percent_completed': percent_completed,
-        'mood_entries': mood_entries, # Include mood data in the context
+        'mood_entries': mood_entries, 
         'mood_percentages': mood_percentages,
         'upcoming_sessions': upcoming_sessions
     }
     return render(request, 'myapp430/employeeprofile.html', context)
 
-def totalCompletion():
-    total_tasks = Task.objects.count()
-    completed_tasks = Task.objects.filter(status='Complete').count()
-    if total_tasks > 0:
-        completion_percentage = (completed_tasks / total_tasks) * 100
-    else:
-        completion_percentage = 0
-    return round(completion_percentage, 2)
-
 # Employee Functions
-# create employee
-def createEmployee(request):
+def createEmployee(request): # create a new employee
     if not request.user.is_authenticated:
         return redirect('login')
     if Employee.objects.filter(user=request.user).exists():
@@ -244,8 +229,8 @@ def createEmployee(request):
             employee.save()
             return HttpResponseRedirect('/success')  
     return render(request, 'myapp430/employeeform.html', {'form': form})
-# update employee info 
-def updateEmployee(request, id):
+
+def updateEmployee(request, id): # update employee info 
     action = 'update'
     employee = Employee.objects.get(employee_id = id)
     form = EmployeeForm(instance=employee)
@@ -258,8 +243,7 @@ def updateEmployee(request, id):
     context = {'action':action, 'form':form}
     return render(request, 'myapp430/employeeform.html', context)
 
-# delete employee
-def deleteEmployee(request, id):
+def deleteEmployee(request, id): # delete employee
     employee = Employee.objects.get(employee_id=id)
     if request.method == 'POST':
         employee.delete()
@@ -268,8 +252,7 @@ def deleteEmployee(request, id):
 
 
 #Task Functions
-#create task
-def createTask(request):
+def createTask(request): # create a new task, doesn't need to be assigned to any employee yet
     form = TaskForm()
     action = 'create'
     if request.method == 'POST':
@@ -280,8 +263,7 @@ def createTask(request):
     context = {'action':action, 'form':form}
     return render(request, 'myapp430/taskform.html', context)
 
-#assign task
-def assignTask(request, id):
+def assignTask(request, id): # assign an existing task to an employee or group of employees
     action = 'assign'
     task = Task.objects.get(task_id=id)
     if request.method == 'POST':
@@ -294,8 +276,7 @@ def assignTask(request, id):
     context = {'action':action, 'form':form}
     return render(request, 'myapp430/taskform.html', context)
 
-# update task
-def updateTask(request, id):
+def updateTask(request, id): # update an existing task's information (deadline, assignee(s), etc.)
     action = 'update'
     task = Task.objects.get(task_id=id)
     if request.method == 'POST':
@@ -314,8 +295,7 @@ def updateTask(request, id):
     context = {'action':action, 'form':form}
     return render(request, 'myapp430/taskform.html', context)
 
-# delete task
-def deleteTask(request, id):
+def deleteTask(request, id): # delete an existing task
     task = Task.objects.get(task_id=id)
     if request.method == 'POST':
         task.delete()
@@ -324,8 +304,7 @@ def deleteTask(request, id):
 
 
 # Events Functions
-# Add Event
-def addEvent(request):
+def addEvent(request): # add a new event
     form = EventsForm()
     action = 'create'
     if request.method == 'POST':
@@ -337,8 +316,7 @@ def addEvent(request):
     context = {'action':action, 'form':form}
     return render(request, 'myapp430/createevent.html', context)
 
-#Update Event
-def updateEvent(request, id):
+def updateEvent(request, id): # update an existing event's information
     action = 'update'
     Event = Events.objects.get(event_id = id)
     form = EventsForm(instance=Event)
@@ -351,8 +329,7 @@ def updateEvent(request, id):
     context = {'action':action, 'form':form}
     return render(request, 'myapp430/createevent.html', context)
 
-#delete event
-def deleteEvent(request, id):
+def deleteEvent(request, id): # delete an existing event
     Event = Events.objects.get(event_id=id)
     if request.method == 'POST':
         Event.delete()
@@ -360,7 +337,7 @@ def deleteEvent(request, id):
     return render(request, 'myapp430/deleteitem.html', {'item':Event})
 
 #@login_required
-def SignupEvent(request, id):
+def SignupEvent(request, id): # sign up to an event in the list
     event = Events.objects.get(event_id=id)
 
     if not request.user.is_authenticated or not hasattr(request.user, 'employee'):
@@ -369,10 +346,12 @@ def SignupEvent(request, id):
     current_user = request.user
 
     # Check if the current employee is already registered for the event
+    # Clicking on an event you already signed up for does nothing
     if EventRegistration.objects.filter(event=event, participant=current_user).exists():
         return redirect('/already_registered')
 
     # Create EventRegistration object for the current user and event
+    # Clicking the sign up button automatically signs up the logged in user
     event_registration = EventRegistration(event=event, participant=current_user)
     event_registration.save()
 
@@ -381,7 +360,8 @@ def SignupEvent(request, id):
 def already_registered(request):
     return render(request, 'myapp430/alreadyregistered.html')
 
-def add_mood(request, employee_id):
+# Mood Functions
+def add_mood(request, employee_id): # input your current mood
     employee = Employee.objects.get(employee_id=employee_id)
     if request.method == 'POST':
         form = MoodForm(request.POST)
@@ -394,15 +374,15 @@ def add_mood(request, employee_id):
         form = MoodForm()
     return render(request, 'myapp430/mood_form.html', {'form': form})
 
-def logo_image_view(request):
+def logo_image_view(request): # display logo on homepage
     image_path = os.path.join(settings.BASE_DIR, 'static', 'logo.png')
     with open(image_path, 'rb') as f:
         return HttpResponse(f.read(), content_type='image/png')
     
-
+# Resources Functions
 from .forms import ResourceForm
 from .models import Resource
-def create_resource(request):
+def create_resource(request): # create a new resource
     form = ResourceForm()
     if request.method == 'POST':
         form = ResourceForm(request.POST)
@@ -411,7 +391,7 @@ def create_resource(request):
             return redirect('/success')  # Redirect to a success page or a resource list
     return render(request, 'myapp430/resource_form.html', {'form': form})
 
-def update_resource(request, resource_id):
+def update_resource(request, resource_id): # update an existing resource element
     resource = Resource.objects.get(resource_id=resource_id)
     form = ResourceForm(instance=resource)  # Pass the instance to the form
     
@@ -423,7 +403,7 @@ def update_resource(request, resource_id):
     
     return render(request, 'myapp430/resource_form.html', {'form': form})
 
-def delete_resource(request, resource_id):
+def delete_resource(request, resource_id): # delete an existing resource
     resource = Resource.objects.get(resource_id=resource_id)
     if request.method == 'POST':
         resource.delete()  # Delete the resource on POST
@@ -431,7 +411,6 @@ def delete_resource(request, resource_id):
     
     return render(request, 'myapp430/deleteitem.html', {'item': resource})
 
-# Successful Execution
+# Successful Execution. Returned whenever any of the above functions executes successfully
 def success(request):
     return render(request, 'myapp430/success.html')
-
