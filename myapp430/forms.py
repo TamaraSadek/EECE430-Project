@@ -1,6 +1,6 @@
 from django.forms import ModelForm, CheckboxSelectMultiple
 from django import forms
-from .models import Employee, Task, Goals, Mood, Events, Rewards, Team, EventRegistration, Resource
+from .models import Employee, Task, Mood, Events, Rewards, Team, EventRegistration, Resource
 from django.contrib.auth.forms import UserCreationForm
 from django import forms
 from django.contrib.auth.models import User
@@ -10,8 +10,13 @@ from .models import Booking
 
 from .models import Employee
 
+class SignUpForm(UserCreationForm): # used for signing up
+    email = forms.EmailField(max_length=254, help_text='Required. Inform a valid email address.')
+    class Meta:
+        model = User
+        fields = ('username', 'email', 'password1', 'password2')
 class RegisterForm(UserCreationForm):
-    email = forms.EmailField(required=True)  # Add an email field
+    email = forms.EmailField(required=True)
 
     class Meta:
         model = User
@@ -24,7 +29,7 @@ class RegisterForm(UserCreationForm):
             user.save()
         return user
     
-class LoginForm(AuthenticationForm):
+class LoginForm(AuthenticationForm): # used for logging in
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.fields['username'].widget.attrs.update({'class': 'form-control'})
@@ -33,22 +38,22 @@ class LoginForm(AuthenticationForm):
     class Meta:
         fields = ['username', 'password']
 
-class TaskForm(ModelForm):
+class TaskForm(ModelForm): # used for creating/updating a task
     class Meta:
         model = Task
         fields = ["employees", "description", "deadline", "points", "status"]
 
-class TaskAssignment(ModelForm):
+class TaskAssignment(ModelForm): # used for assigning a task
      class Meta:
           model = Task
           fields = ["employees"]
 
-class EmployeeForm(ModelForm):
+class EmployeeForm(ModelForm): # used for creating/updating an employee
 	class Meta:
 		model = Employee
 		fields = ["name", "phone", "email", "position", "team", "address"]
 
-class EventsForm(ModelForm):
+class EventsForm(ModelForm): # used for creating/updating an event
     class Meta:
         model = Events
         fields = ['event_name', 'description', 'date', 'location']
@@ -56,12 +61,7 @@ class EventsForm(ModelForm):
             'participants': CheckboxSelectMultiple,  # Render as checkboxes for multiple selection
         }
 
-class GoalsForm(ModelForm):
-    class Meta:
-        model = Goals
-        fields = ["employee", "deadline","description","status"]
-
-class MoodForm(ModelForm):
+class MoodForm(ModelForm): # used for adding a mood
     class Meta:
         model = Mood
         fields = ['mood']
@@ -69,30 +69,24 @@ class MoodForm(ModelForm):
             'mood': forms.Select(choices=Mood.STATUS),
         }
 
-class RewardsForm(ModelForm):
+class RewardsForm(ModelForm): # used for adding a reward in the shop -- not implemented yet
     class Meta:
         model = Rewards
         fields = ["reward_name","description","stock","price"]
 
-class TeamForm(ModelForm):
+class TeamForm(ModelForm): # used for adding/updating a team -- not implemented yet
     class Meta:
         model = Team
         fields = ["team_id", "description", "team_name"]
 
-class ResourceForm(ModelForm):
+class ResourceForm(ModelForm): # used for adding/updating a resource
     class Meta:
         model = Resource
         fields = ["resource_name", "resource_description", "link"]
 
-class SignUpForm(UserCreationForm):
-    email = forms.EmailField(max_length=254, help_text='Required. Inform a valid email address.')
-    class Meta:
-        model = User
-        fields = ('username', 'email', 'password1', 'password2')
-
 from .models import Booking, Employee
 
-class BookingForm(forms.ModelForm):
+class BookingForm(forms.ModelForm): # used for creating a booking for wellness session
     def __init__(self, *args, **kwargs):
         position = kwargs.pop('position', None)
         super().__init__(*args, **kwargs)
